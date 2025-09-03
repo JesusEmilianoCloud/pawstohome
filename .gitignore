@@ -18,9 +18,7 @@ db.sqlite3-journal
 /media/
  
 Archivos de migración
-*/migrations/*.py
-*/migrations/*.pyc
- 
+**/migrations/__init__ 
  
 # Byte-compiled / optimized / DLL files
 __pycache__/
