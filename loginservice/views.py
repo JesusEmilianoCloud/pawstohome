@@ -28,7 +28,6 @@ def register_view(request):
         password = request.POST.get("password")
         phone_number = request.POST.get("phone_number")
 
-
         #Obtiene CustomUser de settings.AUTH_USER_MODEL
         User = get_user_model()
 
