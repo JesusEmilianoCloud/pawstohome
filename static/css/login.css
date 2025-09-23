@@ -1,6 +1,4 @@
-/* Estilos específicos para el login de PawsToHome */
 
-/* Variables específicas para el login */
 :root {
     --auth-spacing: 3rem;
     --form-width: 400px;
@@ -116,8 +114,8 @@
 }
 
 .brand-logo {
-    width: var(--brand-size);
-    height: var(--brand-size);
+    width: 120px;
+    height: 120px;
     background: white;
     border-radius: 50%;
     display: flex;
@@ -127,6 +125,12 @@
     margin: 0 auto 2rem;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease;
+}
+
+.brand-logo img {
+    width: 70%;
+    height: 70%;
+    object-fit: contain;
 }
 
 .brand-logo:hover {

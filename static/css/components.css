@@ -25,6 +25,13 @@
     --text-xs: 12px;
 }
 
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    transition: all 0.3s ease;
+}
+
 /* Tipografía base */
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
