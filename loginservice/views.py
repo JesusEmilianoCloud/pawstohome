@@ -101,16 +101,6 @@ def auth_view(request):
     return render(request, 'loginservice/login.html')
 
 
-# Vistas de compatibilidad (redirigen a la vista combinada)
-def register_view(request):
-    """Vista de compatibilidad - redirige a auth_view"""
-    return auth_view(request)
-
-
-def login_view(request):
-    """Vista de compatibilidad - redirige a auth_view"""
-    return auth_view(request)
-        
 
 def home(request):
     return render(request, 'loginservice/home.html')
