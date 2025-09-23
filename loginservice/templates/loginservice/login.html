@@ -65,7 +65,7 @@
                         <div class="error-message">{{ login_error }}</div>
                     {% endif %}
                     
-                    <form method="post" action="{% url 'loginservice:login' %}">
+                    <form method="post" action="{% url 'loginservice:login-register' %}">
                         {% csrf_token %}
                         <input type="hidden" name="form_type" value="login">
                         
@@ -125,7 +125,7 @@
                         <div class="success-message">{{ register_success }}</div>
                     {% endif %}
                     
-                    <form method="post" action="{% url 'loginservice:register' %}">
+                    <form method="post" action="{% url 'loginservice:login-register' %}">
                         {% csrf_token %}
                         <input type="hidden" name="form_type" value="register">
                         
