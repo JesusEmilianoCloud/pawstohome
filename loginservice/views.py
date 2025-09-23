@@ -28,13 +28,14 @@ def auth_view(request):
         
         if form_type == 'register':
             # Lógica de registro
+            # Orden: nombre, apellido, correo electrónico, nombre de usuario, teléfono, contraseña y confirmar contraseña
             first_name = request.POST.get("first_name")
             last_name = request.POST.get("last_name")
-            username = request.POST.get("username")
             email = request.POST.get("email")
+            username = request.POST.get("username")
+            phone_number = request.POST.get("phone_number")
             password = request.POST.get("password")
             confirm_password = request.POST.get("confirm_password")
-            phone_number = request.POST.get("phone_number")
 
             # Validación de confirmación de contraseña
             if password != confirm_password:

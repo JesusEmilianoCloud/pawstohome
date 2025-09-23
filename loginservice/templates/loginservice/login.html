@@ -128,10 +128,18 @@
                         <input type="hidden" name="form_type" value="register">
                         
                         <div class="form-group">
-                            <label for="register_username">Nombre de usuario</label>
+                            <label for="register_first_name">Nombre</label>
                             <div class="input-with-icon">
                                 <span class="input-icon">👤</span>
-                                <input type="text" id="register_username" name="username" class="form-control with-icon" placeholder="Elige un nombre de usuario" required>
+                                <input type="text" id="register_first_name" name="first_name" class="form-control with-icon" placeholder="Tu nombre" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register_last_name">Apellido</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">👤</span>
+                                <input type="text" id="register_last_name" name="last_name" class="form-control with-icon" placeholder="Tu apellido" required>
                             </div>
                         </div>
                         
@@ -144,18 +152,34 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="register_password1">Contraseña</label>
+                            <label for="register_username">Nombre de usuario</label>
                             <div class="input-with-icon">
-                                <span class="input-icon">🔐</span>
-                                <input type="password" id="register_password1" name="password1" class="form-control with-icon" placeholder="Mínimo 8 caracteres" required>
+                                <span class="input-icon">👤</span>
+                                <input type="text" id="register_username" name="username" class="form-control with-icon" placeholder="Elige un nombre de usuario" required>
                             </div>
                         </div>
                         
                         <div class="form-group">
-                            <label for="register_password2">Confirmar contraseña</label>
+                            <label for="register_phone_number">Teléfono</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">📱</span>
+                                <input type="tel" id="register_phone_number" name="phone_number" class="form-control with-icon" placeholder="Tu número de teléfono" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register_password">Contraseña</label>
                             <div class="input-with-icon">
                                 <span class="input-icon">🔐</span>
-                                <input type="password" id="register_password2" name="password2" class="form-control with-icon" placeholder="Repite tu contraseña" required>
+                                <input type="password" id="register_password" name="password" class="form-control with-icon" placeholder="Mínimo 8 caracteres" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="register_confirm_password">Confirmar contraseña</label>
+                            <div class="input-with-icon">
+                                <span class="input-icon">🔐</span>
+                                <input type="password" id="register_confirm_password" name="confirm_password" class="form-control with-icon" placeholder="Repite tu contraseña" required>
                             </div>
                         </div>
                         
