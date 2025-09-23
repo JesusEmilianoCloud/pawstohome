@@ -1,0 +1,51 @@
+/* Estilos para el header principal tipo barra horizontal */
+.header-bar {
+    background: linear-gradient(90deg, var(--orange-light), var(--orange-medium));
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 2rem;
+    border-radius: 3px;
+    margin: 12px 0 24px 0;
+    box-sizing: border-box;
+}
+.header-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #fff;
+}
+.header-logo img {
+    height: 32px;
+    width: auto;
+    margin-right: 6px;
+}
+.header-nav {
+    display: flex;
+    gap: 32px;
+}
+.header-nav a {
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.header-nav a:hover {
+    color: var(--cream);
+}
+@media (max-width: 768px) {
+    .header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+    }
+    .header-nav {
+        gap: 16px;
+        margin-top: 8px;
+    }
+}

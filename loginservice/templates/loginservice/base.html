@@ -6,21 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}PawsToHome{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
     {% block extra_css %}{% endblock %}
+        <link rel="stylesheet" href="{% static 'css/header.css' %}">
 </head>
 <body>
     <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">🐾 PawsToHome</div>
-                <nav>
-                    <ul>
-                        <li><a href="{% url 'loginservice:home' %}">Inicio</a></li>
-                        <li><a href="{% url 'loginservice:login' %}">Iniciar Sesión</a></li>
-                        <li><a href="{% url 'loginservice:register' %}">Registrarse</a></li>
-                    </ul>
-                </nav>
+        <div class="header-bar">
+            <div class="header-logo">
+                <img src="{% static 'images/Logo.png' %}" alt="PawsToHome Logo">
+                Paws To Home
             </div>
+            <nav class="header-nav">
+                <a href="{% url 'loginservice:home' %}">Inicio</a>
+                <a href="#">Reportes</a>
+                <a href="#">Mapa</a>
+                <a href="#">Educacion</a>
+                <a href="#">Cuenta</a>
+            </nav>
         </div>
     </header>
 
