@@ -170,9 +170,6 @@ $RECYCLE.BIN/
 *~
 
 # Django específico
-media/
-staticfiles/
-static/
 !static/.gitkeep
 migrations/
 !migrations/__init__.py
