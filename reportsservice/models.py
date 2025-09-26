@@ -314,13 +314,6 @@ class Avistamiento(models.Model):
     Representa la entidad AVISTAMIENTO del diagrama
     """
     
-    reporte = models.ForeignKey(
-        Reporte,
-        on_delete=models.CASCADE,
-        related_name='avistamientos',
-        verbose_name="Reporte"
-    )
-    
     usuario = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -380,7 +373,7 @@ class Avistamiento(models.Model):
         ]
     
     def __str__(self):
-        return f"Avistamiento de {self.reporte.nombre_perro} - {self.fecha_avistamiento}"
+        return f"Avistamiento - {self.fecha_avistamiento}"
     
     def set_ubicacion(self, latitud, longitud):
         """Setter para establecer la ubicación del avistamiento"""
@@ -392,11 +385,8 @@ class Avistamiento(models.Model):
     
     def clean(self):
         """Validaciones personalizadas"""
-        from django.core.exceptions import ValidationError
-        
-        # Un usuario no puede reportar avistamientos de sus propios reportes
-        if self.usuario == self.reporte.usuario:
-            raise ValidationError('No puedes reportar avistamientos de tus propios reportes.')
+        # Aquí se pueden agregar validaciones específicas del avistamiento
+        pass
 
 class Comentario(models.Model):
     """
