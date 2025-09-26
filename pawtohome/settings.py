@@ -46,6 +46,13 @@ INSTALLED_APPS = [
 
     #APPS 
     'loginservice',
+
+    #Django-Allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 
@@ -57,6 +64,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    #Django-Allauth middleware
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'pawtohome.urls'
@@ -141,5 +151,36 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'loginservice.CustomUser'
+
+
+#Django-Allauth Config
+AUTHENTICATION_BACKENDS = [
+    #Default backends
+    'django.contrib.auth.backends.ModelBackend',
+
+    # For Google 
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        'APP': {
+            'client_id': '123',
+            'secret': '456',
+            'key': ''
+        }
+    }
+}
+
+#Basic Config.
+LOGIN_URL = 'loginservice:login-register'
+LOGIN_REDIRECT_URL = 'loginservice:home'
+LOGOUT_REDIRECT_URL = 'loginservice:login-register'
 
 
