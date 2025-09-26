@@ -66,7 +66,7 @@ def auth_view(request):
             )
 
             messages.success(request, "Usuario registrado exitosamente.")
-            return redirect('loginservice:home')
+            return redirect('Homeinfo:home')
 
         elif form_type == 'login':
             # Lógica de login
@@ -89,7 +89,7 @@ def auth_view(request):
                 # Valida el password
                 if user.check_password(password):
                     messages.success(request, f"Bienvenido {user.first_name}!")
-                    return redirect('loginservice:home')
+                    return redirect('Homeinfo:home')
                 else:
                     messages.error(request, 'La contraseña no coincide.')
                     return render(request, 'loginservice/login.html')
@@ -100,8 +100,4 @@ def auth_view(request):
     # Si no es POST, renderiza el formulario combinado
     return render(request, 'loginservice/login.html')
 
-
-
-def home(request):
-    return render(request, 'loginservice/home.html')
 

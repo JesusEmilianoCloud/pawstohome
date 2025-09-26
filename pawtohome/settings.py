@@ -44,8 +44,12 @@ INSTALLED_APPS = [
     
     #DEPENDENCIES
 
-    #APPS 
+    #APPS ,
     'loginservice',
+    'reportsservice',
+    'Mapservice',
+    'ProfileService',
+    'Homeinfo',
 ]
 
 
@@ -64,10 +68,13 @@ ROOT_URLCONF = 'pawtohome.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [
+            BASE_DIR / 'templates',  # Templates globales
+        ],
+        'APP_DIRS': True,  # Permite templates por app
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
