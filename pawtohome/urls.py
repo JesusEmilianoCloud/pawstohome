@@ -20,9 +20,24 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    
+    # Ruta raíz - redirige al home
+    path('', include('Homeinfo.urls')),
+    
+    # Aplicaciones
     path('accounts/', include('loginservice.urls')),
+    path('reports/', include('reportsservice.urls')),
+    path('maps/', include('Mapservice.urls')),
+    path('profile/', include('ProfileService.urls')),
+    path('home/', include('Homeinfo.urls')),  # Ruta alternativa al servicio de home
+    
+    # Admin
     path('admin/', admin.site.urls),
+
+    #Django Allauth
     path('auth/', include("allauth.urls")),
+
+    # Ruta principal
 ]
 
 # Servir archivos estáticos y media durante el desarrollo

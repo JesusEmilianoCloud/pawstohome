@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     
     #DEPENDENCIES
 
-    #APPS 
+    #APPS ,
     'loginservice',
 
     #Django-Allauth
@@ -53,6 +53,10 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'reportsservice',
+    'Mapservice',
+    'ProfileService',
+    'Homeinfo',
 ]
 
 
@@ -74,10 +78,13 @@ ROOT_URLCONF = 'pawtohome.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
+        'DIRS': [
+            BASE_DIR / 'templates',  # Templates globales
+        ],
+        'APP_DIRS': True,  # Permite templates por app
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -92,13 +99,18 @@ WSGI_APPLICATION = 'pawtohome.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Configuración flexible: PostgreSQL si hay configuración, SQLite si no
+if os.getenv("DB_NAME"):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv("DB_NAME"),
+            'USER': os.getenv("DB_USER"),
+            'PASSWORD': os.getenv("DB_PASSWORD"),
+            'HOST': os.getenv("DB_HOST"),
+            'PORT': os.getenv("DB_PORT"),
+        }
     }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -151,7 +163,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'loginservice.CustomUser'
-
 
 #Django-Allauth Config
 AUTHENTICATION_BACKENDS = [
