@@ -34,6 +34,9 @@ urlpatterns = [
     # Admin
     path('admin/', admin.site.urls),
 
+    #Django Allauth
+    path('auth/', include("allauth.urls")),
+
     # Ruta principal
 ]
 

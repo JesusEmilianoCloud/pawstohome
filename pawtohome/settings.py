@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 import os
 from pathlib import Path
-import django
 from dotenv import load_dotenv
 
 #take enviornment variables
@@ -47,6 +46,13 @@ INSTALLED_APPS = [
 
     #APPS ,
     'loginservice',
+
+    #Django-Allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'reportsservice',
     'Mapservice',
     'ProfileService',
@@ -62,6 +68,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    #Django-Allauth middleware
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'pawtohome.urls'
@@ -154,3 +163,23 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'loginservice.CustomUser'
+
+#Django-Allauth Config
+AUTHENTICATION_BACKENDS = [
+    #Default backends
+    'django.contrib.auth.backends.ModelBackend',
+
+    # For Google 
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 2
+
+# Provider specific settings
+
+#Basic Config.
+LOGIN_URL = 'loginservice:login-register'
+LOGIN_REDIRECT_URL = 'loginservice:home'
+LOGOUT_REDIRECT_URL = 'loginservice:login-register'
+
+
