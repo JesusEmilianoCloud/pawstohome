@@ -173,13 +173,13 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-SITE_ID = 2
+SITE_ID = 1
 
 # Provider specific settings
 
 #Basic Config.
 LOGIN_URL = 'loginservice:login-register'
-LOGIN_REDIRECT_URL = 'loginservice:home'
+LOGIN_REDIRECT_URL = 'Homeinfo:home'
 LOGOUT_REDIRECT_URL = 'loginservice:login-register'
 
 
