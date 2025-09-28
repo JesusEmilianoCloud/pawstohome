@@ -173,7 +173,7 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-SITE_ID = os.getenv("SITE_ID")
+SITE_ID = int(os.getenv("SITE_ID"))
 
 # Provider specific settings
 
