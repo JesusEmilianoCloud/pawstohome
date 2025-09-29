@@ -5,10 +5,26 @@ from django.contrib.auth import get_user_model
 from .models import ConfiguracionUsuario
 
 # Create your views here.
-
-def getUserProfileData(request):
-    pass
 User = get_user_model()
+
+def getUserProfileData(request, user_id):
+    """
+    Vista para mostrar los datos del perfil de un usuario específico.
+    """
+    user = get_object_or_404(User, pk=user_id)
+    
+    # Obtener la configuración del usuario
+    try:
+        configuracion = ConfiguracionUsuario.objects.get(usuario=user)
+    except ConfiguracionUsuario.DoesNotExist:
+        configuracion = None
+    
+    context = {
+        'profile_user': user,
+        'configuracion': configuracion
+    }
+    
+    return render(request, 'ProfileService/profile_detail.html', context)
 
 @login_required
 def edit_profile_view(request):
