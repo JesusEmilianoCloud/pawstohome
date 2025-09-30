@@ -17,6 +17,36 @@ class ConfiguracionUsuario(models.Model):
         verbose_name="Usuario"
     )
     
+      # Campos de dirección
+    calle = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        verbose_name="Calle"
+    )
+    
+    numero = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        verbose_name="Número",
+        help_text="Número exterior e interior (ej: 123, 45-B)"
+    )
+    
+    codigo_postal = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True,
+        verbose_name="Código Postal"
+    )
+    
+    colonia = models.CharField(
+        max_length=150,
+        blank=True,
+        null=True,
+        verbose_name="Colonia"
+    )
+
     # Configuraciones de notificaciones
     notificaciones_email = models.BooleanField(
         default=True,
