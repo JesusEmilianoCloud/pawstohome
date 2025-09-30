@@ -18,7 +18,7 @@
             </div>
             <nav class="header-nav">
                 <a href="{% url 'Homeinfo:home' %}">Inicio</a>
-                <a href="#">Reportes</a>
+                <a href="{% url 'reportsservice:reportes' %}">Reportes</a>
                 <a href="#">Mapa</a>
                 <a href="#">Educacion</a>
                 <a href="{% url 'ProfileService:profile' user.id %}">Cuenta</a>
