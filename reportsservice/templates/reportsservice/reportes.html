@@ -1,0 +1,233 @@
+{% extends 'Homeinfo/base.html' %}
+{% load static %}
+
+{% block title %}Reportes de Mascotas - PawsToHome{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/reportes.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+    <!-- Header de la página -->
+    <div class="reports-header">
+        <div class="header-content">
+            <h1 class="reports-title">🐾 Reportes de Mascotas</h1>
+            <p class="reports-subtitle">Ayuda a reunir familias en Ciudad Juárez</p>
+            
+            <div class="header-actions">
+                <a href="{% url 'reportsservice:crear_reporte' %}" class="btn btn-primary">
+                    <span>📝</span>
+                    Crear Reporte
+                </a>
+                <button class="btn btn-outline" id="toggle-filters">
+                    <span>🔍</span>
+                    Filtros
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-section" id="filters-panel">
+        <form method="get" class="filters-form">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="tipo_reporte">Tipo de Reporte</label>
+                    <select name="tipo_reporte" id="tipo_reporte" class="form-control">
+                        <option value="">Todos</option>
+                        <option value="perdido" {% if request.GET.tipo_reporte == 'perdido' %}selected{% endif %}>Perdido</option>
+                        <option value="encontrado" {% if request.GET.tipo_reporte == 'encontrado' %}selected{% endif %}>Encontrado</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="tamano">Tamaño</label>
+                    <select name="tamano" id="tamano" class="form-control">
+                        <option value="">Todos</option>
+                        <option value="pequeño" {% if request.GET.tamano == 'pequeño' %}selected{% endif %}>Pequeño</option>
+                        <option value="mediano" {% if request.GET.tamano == 'mediano' %}selected{% endif %}>Mediano</option>
+                        <option value="grande" {% if request.GET.tamano == 'grande' %}selected{% endif %}>Grande</option>
+                        <option value="gigante" {% if request.GET.tamano == 'gigante' %}selected{% endif %}>Gigante</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="zona">Zona</label>
+                    <input type="text" name="zona" id="zona" class="form-control" 
+                           placeholder="Ingresa una zona..." value="{{ request.GET.zona }}">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="raza">Raza</label>
+                    <select name="raza" id="raza" class="form-control">
+                        <option value="">Todas las razas</option>
+                        {% for raza in razas %}
+                            <option value="{{ raza.id }}" 
+                                {% if request.GET.raza == raza.id|stringformat:"s" %}selected{% endif %}>
+                                {{ raza.nombre }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filters-actions">
+                <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                <a href="{% url 'reportsservice:reportes' %}" class="btn btn-outline">Limpiar</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Estadísticas rápidas -->
+    <div class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🔍</div>
+                <div class="stat-info">
+                    <h3>{{ stats.perdidos }}</h3>
+                    <p>Mascotas Perdidas</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">🏠</div>
+                <div class="stat-info">
+                    <h3>{{ stats.encontrados }}</h3>
+                    <p>Mascotas Encontradas</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">💚</div>
+                <div class="stat-info">
+                    <h3>{{ stats.reunidos }}</h3>
+                    <p>Casos Cerrados</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📍</div>
+                <div class="stat-info">
+                    <h3>{{ stats.total }}</h3>
+                    <p>Total de Reportes</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de reportes -->
+    <div class="reports-list">
+        {% if reportes %}
+            <div class="reports-grid">
+                {% for reporte in reportes %}
+                <div class="report-card {% if reporte.tipo_reporte == 'perdido' %}lost{% else %}found{% endif %}">
+                    <div class="report-image">
+                        {% if reporte.fotos.exists %}
+                            <img src="{{ reporte.fotos.first.imagen.url }}" alt="{{ reporte.nombre_perro }}">
+                        {% else %}
+                            <div class="no-image">
+                                <span>📷</span>
+                                <p>Sin foto</p>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="report-badge">
+                            {% if reporte.tipo_reporte == 'perdido' %}
+                                <span class="badge badge-lost">🔍 Perdido</span>
+                            {% else %}
+                                <span class="badge badge-found">🏠 Encontrado</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="report-content">
+                        <h3 class="report-name">{{ reporte.nombre_perro }}</h3>
+                        
+                        <div class="report-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🐕</span>
+                                <span>{{ reporte.raza.nombre|default:"Raza no especificada" }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-icon">📏</span>
+                                <span>{{ reporte.get_tamano_display }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-icon">🎨</span>
+                                <span>{{ reporte.color }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-icon">📍</span>
+                                <span>{{ reporte.zona }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-icon">📅</span>
+                                <span>{{ reporte.fecha_incidente|date:"d M Y" }}</span>
+                            </div>
+                        </div>
+                        
+                        <p class="report-description">
+                            {{ reporte.descripcion|truncatewords:20 }}
+                        </p>
+                    </div>
+                    
+                    <div class="report-footer">
+                        <div class="report-meta">
+                            <span class="report-time">
+                                Reportado {{ reporte.fecha_reporte|timesince }} atrás
+                            </span>
+                        </div>
+                        
+                        <div class="report-actions">
+                            <a href="{% url 'reportsservice:detalle_reporte' reporte.id %}" class="btn btn-sm btn-primary">
+                                Ver Detalle
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Paginación -->
+            {% if is_paginated %}
+            <div class="pagination-section">
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1" class="page-link">Primera</a>
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" class="page-link">Anterior</a>
+                    {% endif %}
+                    
+                    <span class="page-info">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" class="page-link">Siguiente</a>
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}" class="page-link">Última</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="no-reports">
+                <div class="no-reports-icon">🐾</div>
+                <h3>No se encontraron reportes</h3>
+                <p>No hay reportes que coincidan con tus criterios de búsqueda.</p>
+                <a href="{% url 'reportsservice:crear_reporte' %}" class="btn btn-primary">
+                    <span>📝</span>
+                    Crear el primer reporte
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/reportes.js' %}"></script>
+{% endblock %}
