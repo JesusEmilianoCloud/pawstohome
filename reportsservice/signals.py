@@ -65,21 +65,21 @@ def crear_notificaciones_nuevo_reporte(sender, instance, created, **kwargs):
                     mensaje=f"Se ha reportado un perro {instance.tipo_reporte}: {instance.nombre_perro} en {instance.zona}",
                     url=f"/reportes/{instance.id}/"
                 )
-
-@receiver(post_save, sender=Avistamiento)
-def crear_notificacion_avistamiento(sender, instance, created, **kwargs):
-    """
-    Signal para notificar al dueño del reporte cuando hay un nuevo avistamiento
-    """
-    if created:
-        Notificacion.objects.create(
-            usuario=instance.reporte.usuario,
-            reporte=instance.reporte,
-            tipo='avistamiento',
-            titulo="Nuevo avistamiento reportado",
-            mensaje=f"Alguien ha reportado un avistamiento de {instance.reporte.nombre_perro}",
-            url=f"/reportes/{instance.reporte.id}/"
-        )
+# COMENTA ESTAS LÍNEAS COMPLETAS:
+# @receiver(post_save, sender=Avistamiento)
+# def crear_notificacion_avistamiento(sender, instance, created, **kwargs):
+#     """
+#     Signal para notificar al dueño del reporte cuando hay un nuevo avistamiento
+#     """
+#     if created:
+#         Notificacion.objects.create(
+#             usuario=instance.reporte.usuario,
+#             reporte=instance.reporte,
+#             tipo='avistamiento',
+#             titulo="Nuevo avistamiento reportado",
+#             mensaje=f"Alguien ha reportado un avistamiento de {instance.reporte.nombre_perro}",
+#             url=f"/reportes/{instance.reporte.id}/"
+#         )
 
 @receiver(post_save, sender=Comentario)
 def crear_notificacion_comentario(sender, instance, created, **kwargs):

@@ -15,12 +15,6 @@ class FotoReporteInline(admin.TabularInline):
     fields = ['imagen', 'descripcion', 'es_principal', 'orden']
     readonly_fields = ['fecha_subida']
 
-class AvistamientoInline(admin.TabularInline):
-    model = Avistamiento
-    extra = 0
-    fields = ['usuario', 'fecha_avistamiento', 'confianza', 'verificado']
-    readonly_fields = ['fecha_reporte_avistamiento']
-
 class ComentarioInline(admin.TabularInline):
     model = Comentario
     extra = 0
@@ -70,7 +64,7 @@ class ReporteAdmin(admin.ModelAdmin):
         }),
     )
     
-    inlines = [FotoReporteInline, AvistamientoInline, ComentarioInline]
+    inlines = [FotoReporteInline, ComentarioInline]
     
     def get_queryset(self, request):
         return super().get_queryset(request).select_related('usuario', 'raza')
@@ -91,19 +85,22 @@ class FotoReporteAdmin(admin.ModelAdmin):
 @admin.register(Avistamiento)
 class AvistamientoAdmin(admin.ModelAdmin):
     list_display = [
-        'reporte', 'usuario', 'fecha_avistamiento', 
+        'usuario', 'fecha_avistamiento', 
         'confianza', 'verificado', 'fecha_reporte_avistamiento'
     ]
+    
     list_filter = ['confianza', 'verificado', 'fecha_avistamiento']
+    
     search_fields = [
-        'reporte__nombre_perro', 'usuario__username', 
+        'usuario__username',
         'descripcion', 'direccion'
     ]
+    
     readonly_fields = ['fecha_reporte_avistamiento']
     
     fieldsets = (
         ('Información del Avistamiento', {
-            'fields': ('reporte', 'usuario', 'fecha_avistamiento', 'confianza')
+            'fields': ('usuario', 'fecha_avistamiento', 'confianza')
         }),
         ('Ubicación', {
             'fields': (('latitud', 'longitud'), 'direccion')

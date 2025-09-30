@@ -1,0 +1,193 @@
+{% extends 'Homeinfo/base.html' %}
+{% load static %}
+
+{% block title %}Editar Perfil - PawsToHome{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/edit_profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="edit-profile-container">
+    <div class="profile-header">
+        <h1 class="profile-title">Configuración de Perfil</h1>
+        <p class="profile-subtitle">Personaliza tu experiencia en PawsToHome</p>
+    </div>
+
+    <form method="post" class="profile-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- Información Personal -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <span class="section-icon">👤</span>
+                Información Personal
+            </h2>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="first_name">Nombre</label>
+                    <input type="text" id="first_name" name="first_name" 
+                           value="{{ user.first_name }}" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="last_name">Apellido</label>
+                    <input type="text" id="last_name" name="last_name" 
+                           value="{{ user.last_name }}" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <input type="email" id="email" name="email" 
+                           value="{{ user.email }}" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone_number">Teléfono</label>
+                    <input type="tel" id="phone_number" name="phone_number" 
+                           value="{{ user.phone_number }}" class="form-control">
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuraciones de Notificaciones -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <span class="section-icon">🔔</span>
+                Notificaciones
+            </h2>
+            
+            <div class="notification-settings">
+                <div class="toggle-group">
+                    <div class="toggle-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" name="notificaciones_email" 
+                                   {% if configuracion.notificaciones_email %}checked{% endif %}>
+                            <span class="toggle-switch"></span>
+                            <div class="toggle-text">
+                                <strong>Notificaciones por Email</strong>
+                                <p>Recibe alertas por correo electrónico</p>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" name="notificaciones_push" 
+                                   {% if configuracion.notificaciones_push %}checked{% endif %}>
+                            <span class="toggle-switch"></span>
+                            <div class="toggle-text">
+                                <strong>Notificaciones Push</strong>
+                                <p>Recibe alertas instantáneas en el navegador</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="radio_notificaciones">Radio de Notificaciones (km)</label>
+                <div class="range-input">
+                    <input type="range" id="radio_notificaciones" name="radio_notificaciones" 
+                           min="0.1" max="50" step="0.1" 
+                           value="{{ configuracion.radio_notificaciones|default:5 }}" 
+                           class="range-slider">
+                    <span class="range-value">{{ configuracion.radio_notificaciones|default:5 }} km</span>
+                </div>
+                <p class="help-text">Distancia para recibir notificaciones de reportes cercanos</p>
+            </div>
+        </div>
+
+        <!-- Ubicación Preferida -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <span class="section-icon">📍</span>
+                Ubicación Preferida
+            </h2>
+            
+            <div class="location-settings">
+                <p class="location-description">
+                    Establece tu ubicación base para recibir notificaciones de mascotas cercanas
+                </p>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="latitud_preferida">Latitud</label>
+                        <input type="number" id="latitud_preferida" name="latitud_preferida" 
+                               step="0.000001" min="-90" max="90"
+                               value="{{ configuracion.latitud_preferida }}" 
+                               class="form-control" placeholder="31.7619">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="longitud_preferida">Longitud</label>
+                        <input type="number" id="longitud_preferida" name="longitud_preferida" 
+                               step="0.000001" min="-180" max="180"
+                               value="{{ configuracion.longitud_preferida }}" 
+                               class="form-control" placeholder="-106.4850">
+                    </div>
+                </div>
+                
+                <button type="button" class="btn btn-outline" id="get-location-btn">
+                    <span>📍</span>
+                    Usar Ubicación Actual
+                </button>
+            </div>
+        </div>
+
+        <!-- Tipos de Reportes -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <span class="section-icon">🐾</span>
+                Tipos de Reportes
+            </h2>
+            
+            <div class="report-types">
+                <div class="toggle-group">
+                    <div class="toggle-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" name="notificar_perdidos" 
+                                   {% if configuracion.notificar_perdidos %}checked{% endif %}>
+                            <span class="toggle-switch"></span>
+                            <div class="toggle-text">
+                                <strong>Mascotas Perdidas</strong>
+                                <p>Recibe notificaciones de mascotas perdidas</p>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="toggle-item">
+                        <label class="toggle-label">
+                            <input type="checkbox" name="notificar_encontrados" 
+                                   {% if configuracion.notificar_encontrados %}checked{% endif %}>
+                            <span class="toggle-switch"></span>
+                            <div class="toggle-text">
+                                <strong>Mascotas Encontradas</strong>
+                                <p>Recibe notificaciones de mascotas encontradas</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="form-actions">
+            <button type="button" class="btn btn-outline" onclick="history.back()">
+                Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+                <span>💾</span>
+                Guardar Cambios
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/edit_profile.js' %}"></script>
+{% endblock %}
