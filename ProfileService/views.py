@@ -7,7 +7,6 @@ from .models import ConfiguracionUsuario
 # Create your views here.
 User = get_user_model()
 
-<<<<<<< HEAD
 def getUserProfileData(request, user_id):
     """
     Vista para mostrar los datos del perfil de un usuario específico.
@@ -103,5 +102,3 @@ def edit_profile_view(request):
     }
     
     return render(request, 'edit_profile.html', context)
-=======
->>>>>>> c2d7aec (Change on views.py)
