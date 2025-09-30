@@ -1,0 +1,296 @@
+{% extends 'Homeinfo/base.html' %}
+{% load static %}
+
+{% block title %}{{ reporte.nombre_perro }} - {{ reporte.get_tipo_reporte_display }} - PawsToHome{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/detalle_reporte.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="report-detail-container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{% url 'Homeinfo:home' %}">Inicio</a>
+        <span class="separator">›</span>
+        <a href="{% url 'reportsservice:reportes' %}">Reportes</a>
+        <span class="separator">›</span>
+        <span class="current">{{ reporte.nombre_perro }}</span>
+    </nav>
+
+    <!-- Header del reporte -->
+    <div class="report-header">
+        <div class="report-status">
+            {% if reporte.tipo_reporte == 'perdido' %}
+                <span class="status-badge lost">🔍 Mascota Perdida</span>
+            {% else %}
+                <span class="status-badge found">🏠 Mascota Encontrada</span>
+            {% endif %}
+            
+            <span class="state-badge {{ reporte.estado }}">{{ reporte.get_estado_display }}</span>
+        </div>
+        
+        <h1 class="report-title">{{ reporte.nombre_perro }}</h1>
+        <p class="report-subtitle">{{ reporte.get_tipo_reporte_display }} en {{ reporte.zona }}</p>
+    </div>
+
+    <div class="report-content">
+        <div class="main-content">
+            <!-- Galería de fotos -->
+            {% if reporte.fotos.exists %}
+            <div class="photo-gallery">
+                <div class="main-photo">
+                    <img src="{{ reporte.fotos.first.imagen.url }}" alt="{{ reporte.nombre_perro }}" id="main-image">
+                </div>
+                
+                {% if reporte.fotos.count > 1 %}
+                <div class="photo-thumbnails">
+                    {% for foto in reporte.fotos.all %}
+                    <div class="thumbnail {% if forloop.first %}active{% endif %}" 
+                         onclick="changeMainImage('{{ foto.imagen.url }}', this)">
+                        <img src="{{ foto.imagen.url }}" alt="{{ foto.descripcion }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="no-photos">
+                <div class="no-photo-icon">📷</div>
+                <p>No hay fotos disponibles para este reporte</p>
+            </div>
+            {% endif %}
+
+            <!-- Información de la mascota -->
+            <div class="pet-info-section">
+                <h2 class="section-title">
+                    <span class="section-icon">🐾</span>
+                    Información de la Mascota
+                </h2>
+                
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-icon">🐕</div>
+                        <div class="info-content">
+                            <h4>Nombre</h4>
+                            <p>{{ reporte.nombre_perro }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-icon">🏷️</div>
+                        <div class="info-content">
+                            <h4>Raza</h4>
+                            <p>{{ reporte.raza.nombre|default:"No especificada" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-icon">📏</div>
+                        <div class="info-content">
+                            <h4>Tamaño</h4>
+                            <p>{{ reporte.get_tamano_display }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-icon">🎨</div>
+                        <div class="info-content">
+                            <h4>Color</h4>
+                            <p>{{ reporte.color }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descripción -->
+            <div class="description-section">
+                <h2 class="section-title">
+                    <span class="section-icon">📝</span>
+                    Descripción
+                </h2>
+                <div class="description-content">
+                    <p>{{ reporte.descripcion|linebreaks }}</p>
+                    
+                    {% if reporte.caracteristicas_distintivas %}
+                    <div class="distinctive-features">
+                        <h4>Características Distintivas:</h4>
+                        <p>{{ reporte.caracteristicas_distintivas|linebreaks }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Comentarios -->
+            <div class="comments-section">
+                <h2 class="section-title">
+                    <span class="section-icon">💬</span>
+                    Comentarios ({{ reporte.comentarios.count }})
+                </h2>
+                
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'reportsservice:agregar_comentario' reporte.id %}" class="comment-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="tipo">Tipo de comentario</label>
+                        <select name="tipo" id="tipo" class="form-control">
+                            <option value="informacion">Información</option>
+                            <option value="avistamiento">Avistamiento</option>
+                            <option value="pregunta">Pregunta</option>
+                            <option value="actualizacion">Actualización</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contenido">Comentario</label>
+                        <textarea name="contenido" id="contenido" class="form-control" 
+                                  placeholder="Escribe tu comentario..." required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Agregar Comentario</button>
+                </form>
+                {% endif %}
+                
+                <div class="comments-list">
+                    {% for comentario in reporte.comentarios.all %}
+                    <div class="comment-item">
+                        <div class="comment-header">
+                            <div class="comment-author">
+                                <div class="author-avatar">
+                                    {{ comentario.usuario.first_name|first|upper }}{{ comentario.usuario.last_name|first|upper }}
+                                </div>
+                                <div class="author-info">
+                                    <span class="author-name">{{ comentario.usuario.first_name }} {{ comentario.usuario.last_name }}</span>
+                                    <span class="comment-time">{{ comentario.fecha_comentario|timesince }} atrás</span>
+                                </div>
+                            </div>
+                            <span class="comment-type {{ comentario.tipo }}">{{ comentario.get_tipo_display }}</span>
+                        </div>
+                        
+                        <div class="comment-content">
+                            <p>{{ comentario.contenido|linebreaks }}</p>
+                            
+                            {% if comentario.tiene_ubicacion %}
+                            <div class="comment-location">
+                                <span class="location-icon">📍</span>
+                                <span>Ubicación: {{ comentario.latitud|floatformat:4 }}, {{ comentario.longitud|floatformat:4 }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="no-comments">
+                        <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar con información adicional -->
+        <div class="sidebar">
+            <!-- Información de ubicación -->
+            <div class="sidebar-card">
+                <h3 class="card-title">
+                    <span class="card-icon">📍</span>
+                    Ubicación
+                </h3>
+                
+                <div class="location-info">
+                    <p><strong>Dirección:</strong> {{ reporte.direccion }}</p>
+                    <p><strong>Zona:</strong> {{ reporte.zona }}</p>
+                    <p><strong>Coordenadas:</strong> {{ reporte.latitud|floatformat:4 }}, {{ reporte.longitud|floatformat:4 }}</p>
+                </div>
+                
+                <div class="map-placeholder">
+                    <div class="map-icon">🗺️</div>
+                    <p>Mapa de ubicación</p>
+                    <small>Lat: {{ reporte.latitud|floatformat:4 }}, Lon: {{ reporte.longitud|floatformat:4 }}</small>
+                </div>
+            </div>
+
+            <!-- Información de fechas -->
+            <div class="sidebar-card">
+                <h3 class="card-title">
+                    <span class="card-icon">📅</span>
+                    Fechas Importantes
+                </h3>
+                
+                <div class="dates-info">
+                    <div class="date-item">
+                        <span class="date-label">Fecha del incidente:</span>
+                        <span class="date-value">{{ reporte.fecha_incidente|date:"d M Y, H:i" }}</span>
+                    </div>
+                    
+                    <div class="date-item">
+                        <span class="date-label">Reportado:</span>
+                        <span class="date-value">{{ reporte.fecha_reporte|date:"d M Y, H:i" }}</span>
+                    </div>
+                    
+                    {% if reporte.fecha_cierre %}
+                    <div class="date-item">
+                        <span class="date-label">Cerrado:</span>
+                        <span class="date-value">{{ reporte.fecha_cierre|date:"d M Y, H:i" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Información de contacto -->
+            <div class="sidebar-card">
+                <h3 class="card-title">
+                    <span class="card-icon">📞</span>
+                    Contacto
+                </h3>
+                
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <span class="contact-icon">📱</span>
+                        <a href="tel:{{ reporte.telefono_contacto }}">{{ reporte.telefono_contacto }}</a>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <span class="contact-icon">📧</span>
+                        <a href="mailto:{{ reporte.email_contacto }}">{{ reporte.email_contacto }}</a>
+                    </div>
+                </div>
+                
+                <div class="contact-buttons">
+                    <a href="tel:{{ reporte.telefono_contacto }}" class="btn btn-primary btn-block">
+                        <span>📞</span>
+                        Llamar
+                    </a>
+                    <a href="mailto:{{ reporte.email_contacto }}" class="btn btn-outline btn-block">
+                        <span>📧</span>
+                        Enviar Email
+                    </a>
+                </div>
+            </div>
+
+            <!-- Reportado por -->
+            <div class="sidebar-card">
+                <h3 class="card-title">
+                    <span class="card-icon">👤</span>
+                    Reportado por
+                </h3>
+                
+                <div class="reporter-info">
+                    <div class="reporter-avatar">
+                        {{ reporte.usuario.first_name|first|upper }}{{ reporte.usuario.last_name|first|upper }}
+                    </div>
+                    <div class="reporter-details">
+                        <p class="reporter-name">{{ reporte.usuario.first_name }} {{ reporte.usuario.last_name }}</p>
+                        <p class="reporter-username">@{{ reporte.usuario.username }}</p>
+                        <p class="reporter-date">Miembro desde {{ reporte.usuario.date_joined|date:"M Y" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/detalle_reporte.js' %}"></script>
+{% endblock %}
