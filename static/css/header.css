@@ -41,6 +41,37 @@
 .header-nav a:hover {
     color: var(--cream);
 }
+
+.user-menu {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.user-menu a {
+    color: var(--cream);
+    font-size: var(--text-base);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.user-menu a:hover {
+    color: var(--cream);
+}
+
+.logout-link {
+    padding: 4px 12px;
+    border: 1px solid var(--cream);
+    border-radius: 4px;
+    font-size: 14px !important;
+    transition: all 0.2s;
+}
+
+.logout-link:hover {
+    background-color: var(--cream);
+    color: var(--primary-color) !important;
+}
+
 @media (max-width: 768px) {
     .header-bar {
         flex-direction: column;
@@ -50,5 +81,10 @@
     .header-nav {
         gap: 16px;
         margin-top: 8px;
+    }
+    .user-menu {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
     }
 }

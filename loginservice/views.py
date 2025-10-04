@@ -1,5 +1,5 @@
 from django.contrib import messages
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, authenticate
 from django.shortcuts import redirect, render
 
 
@@ -82,19 +82,17 @@ def auth_view(request):
                 messages.error(request, "Debe ingresar su contraseña.")
                 return render(request, 'loginservice/login.html')
 
-            # Obtiene el modelo settings.AUTH_USER_MODEL
-            User = get_user_model()
-            try:
-                user = User.objects.get(username=username)
-                # Valida el password
-                if user.check_password(password):
-                    messages.success(request, f"Bienvenido {user.first_name}!")
-                    return redirect('Homeinfo:home')
-                else:
-                    messages.error(request, 'La contraseña no coincide.')
-                    return render(request, 'loginservice/login.html')
-            except User.DoesNotExist:
-                messages.error(request, 'El usuario no existe.')
+            # Usa authenticate() que maneja múltiples backends automáticamente
+            user = authenticate(request, username=username, password=password)
+            
+            if user is not None:
+                # Usuario autenticado correctamente
+                login(request, user)
+                messages.success(request, f"Bienvenido {user.first_name or user.username}!")
+                return redirect('Homeinfo:home')
+            else:
+                # Credenciales incorrectas
+                messages.error(request, 'Usuario o contraseña incorrectos.')
                 return render(request, 'loginservice/login.html')
 
     # Si no es POST, renderiza el formulario combinado

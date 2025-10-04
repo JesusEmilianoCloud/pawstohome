@@ -22,10 +22,12 @@
                 <a href="#">Mapa</a>
                 <a href="#">Educacion</a>
 
-                {% if request.user.is_authenticated %}
-                    <a href="{% url 'ProfileService:profile' request.user.id %}">Cuenta</a>
+                {% if user.is_authenticated %}
+                    <div class="user-menu">
+                        <a href="{% url 'ProfileService:profile' user.id %}">Cuenta</a>
+                    </div>
                 {% else %}
-                    <a href="{% url 'Homeinfo:home' %}">Iniciar sesión</a>
+                    <a href="{% url 'loginservice:login-register' %}">Iniciar sesión</a>
                 {% endif %}
             </nav>
 

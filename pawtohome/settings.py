@@ -180,6 +180,6 @@ SITE_ID = int(os.getenv("SITE_ID"))
 #Basic Config.
 LOGIN_URL = 'loginservice:login-register'
 LOGIN_REDIRECT_URL = 'Homeinfo:home'
-LOGOUT_REDIRECT_URL = 'loginservice:login-register'
+LOGOUT_REDIRECT_URL = 'Homeinfo:home'
 
 
