@@ -4,180 +4,163 @@
 {% block title %}PawsToHome - Inicio{% endblock %}
 
 {% block extra_css %}
-<style>
-    .hero-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        text-align: center;
-        padding: 4rem 0;
-        margin: 2rem 0;
-        border-radius: 10px;
-    }
-
-    .hero-title {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-        font-weight: bold;
-    }
-
-    .hero-subtitle {
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
-        opacity: 0.9;
-    }
-
-    .features-section {
-        padding: 3rem 0;
-    }
-
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-        margin-top: 2rem;
-    }
-
-    .feature-card {
-        background: white;
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        text-align: center;
-        transition: transform 0.3s;
-    }
-
-    .feature-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .feature-icon {
-        font-size: 3rem;
-        margin-bottom: 1rem;
-    }
-
-    .feature-title {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        color: #2c3e50;
-    }
-
-    .feature-description {
-        color: #666;
-        line-height: 1.6;
-    }
-
-    .cta-section {
-        background-color: #2c3e50;
-        color: white;
-        text-align: center;
-        padding: 3rem 0;
-        margin: 3rem 0;
-        border-radius: 10px;
-    }
-
-    .cta-title {
-        font-size: 2rem;
-        margin-bottom: 1rem;
-    }
-
-    .cta-description {
-        font-size: 1.1rem;
-        margin-bottom: 2rem;
-        opacity: 0.9;
-    }
-
-    .btn-cta {
-        display: inline-block;
-        padding: 1rem 2rem;
-        background-color: #e74c3c;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        font-size: 1.1rem;
-        font-weight: bold;
-        transition: background-color 0.3s;
-        margin: 0 0.5rem;
-    }
-
-    .btn-cta:hover {
-        background-color: #c0392b;
-    }
-
-    .btn-secondary {
-        background-color: transparent;
-        border: 2px solid white;
-    }
-
-    .btn-secondary:hover {
-        background-color: white;
-        color: #2c3e50;
-    }
-
-    @media (max-width: 768px) {
-        .hero-title {
-            font-size: 2rem;
-        }
-
-        .features-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .btn-cta {
-            display: block;
-            margin: 0.5rem 0;
-        }
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
 
 {% block content %}
-<div class="hero-section">
-    <div class="container">
-        <h1 class="hero-title">🐾 Bienvenido a PawsToHome</h1>
-        <p class="hero-subtitle">Conectando corazones con patas. Encuentra tu compañero perfecto o ayuda a una mascota a encontrar su hogar.</p>
-        <div>
-            <a href="{% url 'loginservice:login-register' %}" class="btn-cta">Comenzar Ahora</a>
-            <a href="#features" class="btn-cta btn-secondary">Saber Más</a>
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-orange">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1>Reuniendo Familias en Juarez</h1>
+            <p>La plataforma digital que conecta perros perdidos con sus familias. Una red confiable para que ningún perro se quede sin hogar</p>
+            <div class="hero-buttons">
+                <a href="{% url 'reportsservice:crear_reporte' %}" class="btn-hero btn-primary">Reportar perro perdido</a>
+                <a href="{% url 'reportsservice:reportes' %}" class="btn-hero btn-secondary">Ver Reportes</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div style="font-size: 200px; color: rgba(255,255,255,0.3);">🐕</div>
         </div>
     </div>
-</div>
+</section>
 
-<section id="features" class="features-section">
-    <div class="container">
-        <h2 class="text-center" style="font-size: 2.5rem; margin-bottom: 1rem; color: #2c3e50;">¿Por qué elegir PawsToHome?</h2>
-        <p class="text-center" style="font-size: 1.1rem; color: #666; margin-bottom: 3rem;">Nuestra plataforma hace que adoptar y encontrar hogares para mascotas sea fácil y seguro.</p>
+<!-- Features Section -->
+<section class="features-section">
+    <div class="section-container">
+        <h2 class="section-title">¿Cómo Funciona PawsToHome?</h2>
+        <p class="section-subtitle">Una plataforma integral diseñada para reunir a las mascotas perdidas con sus familias de manera rápida y eficiente</p>
         
         <div class="features-grid">
             <div class="feature-card">
-                <div class="feature-icon">🏠</div>
-                <h3 class="feature-title">Adopciones Seguras</h3>
-                <p class="feature-description">Proceso de adopción verificado y seguro para garantizar el bienestar de todas las mascotas.</p>
+                <div class="feature-badge">Geo activo</div>
+                <div class="feature-icon">📍</div>
+                <h3 class="feature-title">Mapa Interactivo</h3>
+                <p class="feature-description">Visualiza en tiempo real todos los reportes de perros perdidos y encontrados en Ciudad Juárez. Utiliza geolocalización para encontrar casos cerca de ti.</p>
+                <a href="{% url 'reportsservice:reportes' %}" class="feature-btn">Explorar Mapa</a>
             </div>
-            
+
             <div class="feature-card">
-                <div class="feature-icon">❤️</div>
-                <h3 class="feature-title">Conexiones Genuinas</h3>
-                <p class="feature-description">Emparejamos mascotas con familias basándose en compatibilidad y necesidades específicas.</p>
+                <div class="feature-badge blue">100% Seguro</div>
+                <div class="feature-icon">🛡️</div>
+                <h3 class="feature-title">Seguro y confiable</h3>
+                <p class="feature-description">Protegemos tu información personal y verificamos la autenticidad de los reportes para una experiencia segura.</p>
+                <a href="{% url 'loginservice:login-register' %}" class="feature-btn">Crear Cuenta</a>
             </div>
-            
+
             <div class="feature-card">
-                <div class="feature-icon">🌟</div>
-                <h3 class="feature-title">Apoyo Continuo</h3>
-                <p class="feature-description">Brindamos apoyo y recursos continuos para asegurar una transición exitosa.</p>
+                <div class="feature-badge orange">Data Sensible</div>
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Seguimiento Inteligente</h3>
+                <p class="feature-description">Crea reportes completos con fotos, descripciones detalladas y efectúa el seguimiento de tu búsqueda hasta reunir con tu mascota.</p>
+                <a href="{% url 'reportsservice:crear_reporte' %}" class="feature-btn">Crear Reporte</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-badge green">Eco Linea</div>
+                <div class="feature-icon">💡</div>
+                <h3 class="feature-title">Guías de Prevención</h3>
+                <p class="feature-description">Aprende cómo prevenir que tu mascota se extravíe con consejos de expertos. Accede con contenidos de entrenamiento y cuidado responsable.</p>
+                <a href="#" class="feature-btn">Ver Guías</a>
             </div>
         </div>
     </div>
 </section>
 
-<div class="cta-section">
-    <div class="container">
-        <h2 class="cta-title">¿Listo para hacer la diferencia?</h2>
-        <p class="cta-description">Únete a nuestra comunidad y ayuda a dar una segunda oportunidad a las mascotas que lo necesitan.</p>
-        <div>
-            <a href="{% url 'loginservice:login-register' %}" class="btn-cta">Registrarse</a>
-            <a href="{% url 'loginservice:login-register' %}" class="btn-cta btn-secondary">Iniciar Sesión</a>
+<!-- Pets Section -->
+<section class="pets-section">
+    <div class="section-container">
+        <h2 class="section-title">Mascotas Buscando a su Familia</h2>
+        <p class="section-subtitle">Ayúdanos a reunir a estas mascotas con sus dueños</p>
+        
+        <div class="pets-grid">
+            {% if reportes_recientes %}
+                {% for reporte in reportes_recientes %}
+                <div class="pet-card">
+                    <div class="pet-image">
+                        <div class="pet-status {% if reporte.tipo_reporte == 'encontrado' %}found{% endif %}">
+                            {% if reporte.tipo_reporte == 'perdido' %}Perdido{% else %}Encontrado{% endif %}
+                        </div>
+                        {% if reporte.fotos.first %}
+                            <img src="{{ reporte.fotos.first.foto.url }}" alt="{{ reporte.nombre_perro }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        {% else %}
+                            <span style="font-size: 80px;">🐕</span>
+                        {% endif %}
+                    </div>
+                    <div class="pet-info">
+                        <div class="pet-name">{{ reporte.nombre_perro }}</div>
+                        <div class="pet-breed">{{ reporte.raza.nombre|default:"Sin raza especificada" }}</div>
+                        <div class="pet-location">📍 {{ reporte.zona }}, Juárez</div>
+                        <div class="pet-actions">
+                            <a href="{% url 'reportsservice:detalle_reporte' reporte.id %}" class="pet-btn pet-btn-primary">Ver Detalles</a>
+                            <a href="{% url 'reportsservice:detalle_reporte' reporte.id %}" class="pet-btn pet-btn-secondary">
+                                {% if reporte.tipo_reporte == 'perdido' %}Contactar{% else %}¿Es Tuyo?{% endif %}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <!-- Tarjetas de ejemplo si no hay reportes -->
+                <div class="pet-card">
+                    <div class="pet-image">
+                        <div class="pet-status">Perdido</div>
+                        <span style="font-size: 80px;">🐕‍🦺</span>
+                    </div>
+                    <div class="pet-info">
+                        <div class="pet-name">Gigi</div>
+                        <div class="pet-breed">Poodle</div>
+                        <div class="pet-location">📍 Centro, Juárez</div>
+                        <div class="pet-actions">
+                            <a href="{% url 'reportsservice:reportes' %}" class="pet-btn pet-btn-primary">Ver Detalles</a>
+                            <a href="{% url 'reportsservice:crear_reporte' %}" class="pet-btn pet-btn-secondary">Contactar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pet-card">
+                    <div class="pet-image">
+                        <div class="pet-status found">Encontrado</div>
+                        <span style="font-size: 80px;">🐕</span>
+                    </div>
+                    <div class="pet-info">
+                        <div class="pet-name">Max</div>
+                        <div class="pet-breed">Chihuahua</div>
+                        <div class="pet-location">📍 San Lorenzo, Juárez</div>
+                        <div class="pet-actions">
+                            <a href="{% url 'reportsservice:reportes' %}" class="pet-btn pet-btn-primary">Ver Detalles</a>
+                            <a href="{% url 'reportsservice:crear_reporte' %}" class="pet-btn pet-btn-secondary">¿Es Tuyo?</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pet-card">
+                    <div class="pet-image">
+                        <div class="pet-status">Perdido</div>
+                        <span style="font-size: 80px;">�</span>
+                    </div>
+                    <div class="pet-info">
+                        <div class="pet-name">Maya</div>
+                        <div class="pet-breed">Husky Siberiano</div>
+                        <div class="pet-location">📍 Centro, Juárez</div>
+                        <div class="pet-actions">
+                            <a href="{% url 'reportsservice:reportes' %}" class="pet-btn pet-btn-primary">Ver Detalles</a>
+                            <a href="{% url 'reportsservice:crear_reporte' %}" class="pet-btn pet-btn-secondary">Contactar</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
-</div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="section-container">
+        <h2 class="cta-title">¿Perdiste a tu mascota?</h2>
+        <p class="cta-description">No esperes más. Mientras más rápido reportes, mayores son las posibilidades de encontrarla.</p>
+        <a href="{% url 'reportsservice:crear_reporte' %}" class="cta-btn">Reportar perro perdido</a>
+    </div>
+</section>
 {% endblock %}
 
