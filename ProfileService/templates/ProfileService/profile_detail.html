@@ -49,8 +49,12 @@
             </div>
         </div>
         
-        {% if user == profile_user %}
-            <div class="profile-actions">
+        <div class="profile-actions">
+            <a href="{% url 'ProfileService:user_reports' profile_user.id %}" class="btn btn-outline">
+                <span>📋</span>
+                Ver Reportes
+            </a>
+            {% if user == profile_user %}
                 <a href="{% url 'ProfileService:edit_profile' %}" class="btn btn-primary">
                     <span>✏️</span>
                     Editar Perfil
@@ -59,8 +63,8 @@
                     <span>🚪</span>
                     Cerrar Sesión
                 </a>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 
     <div class="profile-content">
