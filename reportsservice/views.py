@@ -5,7 +5,9 @@ from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.utils import timezone
+from django.contrib.admin.views.decorators import staff_member_required
 from .models import Reporte, Raza, FotoReporte, Comentario
+from .utils import CloudflareR2ImageUploader, upload_foto_reporte_to_r2
 
 def lista_reportes(request):
     """
@@ -163,3 +165,65 @@ def agregar_comentario(request, id):
         messages.success(request, 'Comentario agregado exitosamente.')
         
     return redirect('reportsservice:detalle_reporte', id=id)
+
+@staff_member_required
+def resubir_imagen_r2(request, foto_id):
+    """
+    Vista para resubir manualmente una imagen a Cloudflare R2
+    Solo accesible por staff/administradores
+    """
+    foto = get_object_or_404(FotoReporte, id=foto_id)
+    
+    if request.method == 'POST':
+        # Intentar subir la imagen
+        success = upload_foto_reporte_to_r2(foto, async_upload=False)
+        
+        if success:
+            messages.success(request, f'Imagen subida exitosamente a Cloudflare R2')
+        else:
+            messages.error(request, f'Error al subir la imagen a Cloudflare R2')
+        
+        return redirect('reportsservice:detalle_reporte', id=foto.reporte.id)
+    
+    # GET request - mostrar confirmación
+    context = {
+        'foto': foto,
+        'r2_enabled': CloudflareR2ImageUploader.is_r2_enabled(),
+        'exists_in_r2': CloudflareR2ImageUploader.check_file_exists_in_r2(foto.imagen.name) if foto.imagen else False,
+    }
+    
+    return render(request, 'reportsservice/resubir_imagen.html', context)
+
+@staff_member_required  
+def estado_cloudflare_r2(request):
+    """
+    Vista para mostrar el estado de Cloudflare R2 y estadísticas de imágenes
+    Solo accesible por staff/administradores
+    """
+    context = {
+        'r2_enabled': CloudflareR2ImageUploader.is_r2_enabled(),
+        'total_fotos': FotoReporte.objects.count(),
+    }
+    
+    # Calcular estadísticas de imágenes que existen localmente
+    fotos_locales = 0
+    fotos_sin_archivo = 0
+    
+    for foto in FotoReporte.objects.all():
+        if foto.imagen and hasattr(foto.imagen, 'path'):
+            try:
+                if foto.imagen.path and foto.imagen.storage.exists(foto.imagen.name):
+                    fotos_locales += 1
+                else:
+                    fotos_sin_archivo += 1
+            except:
+                fotos_sin_archivo += 1
+        else:
+            fotos_sin_archivo += 1
+    
+    context.update({
+        'fotos_locales': fotos_locales,
+        'fotos_sin_archivo': fotos_sin_archivo,
+    })
+    
+    return render(request, 'reportsservice/estado_r2.html', context)
