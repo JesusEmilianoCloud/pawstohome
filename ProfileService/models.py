@@ -132,60 +132,90 @@ class ConfiguracionUsuario(models.Model):
         """Verifica si el usuario tiene foto de perfil"""
         return bool(self.foto_perfil)
     
-    def geocodificar_direccion(self):
+    def geocodificar_coordenadas(self):
         """
-        Convierte la dirección en coordenadas usando OpenStreetMap Nominatim API
-        Retorna un diccionario con lat, lon, o None si falla
+        Convierte las coordenadas en dirección usando OpenStreetMap Nominatim API (Reverse Geocoding)
+        Retorna un diccionario con la dirección o None si falla
         """
-        if not self.direccion:
+        if not self.tiene_ubicacion_preferida():
             return None
         
         try:
-            # Usar Nominatim API (gratuito, no requiere API key)
-            url = "https://nominatim.openstreetmap.org/search"
+            # Usar Nominatim API para geocodificación inversa
+            url = "https://nominatim.openstreetmap.org/reverse"
             params = {
-                'q': self.direccion,
+                'lat': self.latitud_preferida,
+                'lon': self.longitud_preferida,
                 'format': 'json',
-                'limit': 1,
-                'countrycodes': 'mx',  # Limitar a México
-                'addressdetails': 1
+                'addressdetails': 1,
+                'accept-language': 'es',  # Preferir respuestas en español
+                'countrycodes': 'mx'  # Limitar a México
             }
             
             headers = {
-                'User-Agent': 'PawsToHome/1.0 (geocoding for pet location service)'
+                'User-Agent': 'PawsToHome/1.0 (reverse geocoding for pet location service)'
             }
             
             response = requests.get(url, params=params, headers=headers, timeout=5)
             
             if response.status_code == 200:
                 data = response.json()
-                if data:
-                    result = data[0]
-                    lat = float(result.get('lat'))
-                    lon = float(result.get('lon'))
+                if data and 'display_name' in data:
+                    # Construir dirección más legible
+                    address = data.get('address', {})
+                    
+                    # Componentes de la dirección
+                    numero = address.get('house_number', '')
+                    calle = address.get('road', '')
+                    colonia = address.get('neighbourhood') or address.get('suburb', '')
+                    ciudad = address.get('city') or address.get('town') or address.get('village', '')
+                    estado = address.get('state', '')
+                    
+                    # Construir dirección formateada
+                    partes_direccion = []
+                    
+                    if calle:
+                        if numero:
+                            partes_direccion.append(f"{calle} {numero}")
+                        else:
+                            partes_direccion.append(calle)
+                    
+                    if colonia:
+                        partes_direccion.append(f"Colonia {colonia}")
+                    
+                    if ciudad:
+                        partes_direccion.append(ciudad)
+                    
+                    if estado:
+                        partes_direccion.append(estado)
+                    
+                    direccion_formateada = ", ".join(partes_direccion)
+                    
+                    # Si no se pudo formatear bien, usar display_name completo
+                    if not direccion_formateada.strip():
+                        direccion_formateada = data['display_name']
                     
                     return {
-                        'latitud': lat,
-                        'longitud': lon,
-                        'display_name': result.get('display_name', ''),
+                        'direccion': direccion_formateada,
+                        'direccion_completa': data['display_name'],
+                        'componentes': address,
                         'success': True
                     }
             
             return None
             
         except Exception as e:
-            print(f"Error en geocodificación: {e}")
+            print(f"Error en geocodificación inversa: {e}")
             return None
     
-    def actualizar_coordenadas_desde_direccion(self):
+    def actualizar_direccion_desde_coordenadas(self):
         """
-        Actualiza las coordenadas preferidas basándose en la dirección
+        Actualiza la dirección basándose en las coordenadas preferidas
         """
-        if self.direccion:
-            resultado = self.geocodificar_direccion()
+        if self.tiene_ubicacion_preferida():
+            resultado = self.geocodificar_coordenadas()
             if resultado and resultado.get('success'):
-                self.latitud_preferida = resultado['latitud']
-                self.longitud_preferida = resultado['longitud']
+                self.direccion = resultado['direccion']
                 return True
         return False
     

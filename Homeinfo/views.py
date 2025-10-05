@@ -33,3 +33,19 @@ def home(request):
     }
     
     return render(request, 'Homeinfo/home.html', context)
+
+def informacion(request):
+    """Vista de información sobre PawsToHome"""
+    # Estadísticas generales
+    stats = {
+        'total_reportes': Reporte.objects.filter(visible=True).count(),
+        'perdidos': Reporte.objects.filter(tipo_reporte='perdido', estado='activo', visible=True).count(),
+        'encontrados': Reporte.objects.filter(tipo_reporte='encontrado', estado='activo', visible=True).count(),
+        'reunidos': Reporte.objects.filter(estado='cerrado', visible=True).count(),
+    }
+    
+    context = {
+        'stats': stats,
+    }
+    
+    return render(request, 'Homeinfo/informacion.html', context)

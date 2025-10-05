@@ -1,0 +1,448 @@
+{% extends 'Homeinfo/base.html' %}
+{% load static %}
+
+{% block title %}Información - PawsToHome{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/informacion.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="info-container">
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">🐾 PawsToHome</h1>
+            <p class="hero-subtitle">Reuniendo familias, una pata a la vez</p>
+        </div>
+    </div>
+
+    <!-- Misión y Visión -->
+    <div class="mission-section">
+        <div class="container">
+            <div class="mission-grid">
+                <div class="mission-card">
+                    <div class="mission-icon">🎯</div>
+                    <h2>Nuestra Misión</h2>
+                    <p>Facilitar la reunión entre mascotas perdidas y sus familias a través de una plataforma tecnológica accesible y eficiente, creando una red de apoyo comunitario para el bienestar animal.</p>
+                </div>
+                
+                <div class="mission-card">
+                    <div class="mission-icon">🌟</div>
+                    <h2>Nuestra Visión</h2>
+                    <p>Ser la plataforma líder en México para la recuperación de mascotas perdidas, donde cada mascota tenga la oportunidad de regresar a casa y cada familia encuentre esperanza.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-section">
+        <div class="container">
+            <h2 class="section-title">📊 Impacto de Nuestra Comunidad</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.total_reportes }}</div>
+                    <div class="stat-label">Reportes Totales</div>
+                    <div class="stat-icon">📝</div>
+                </div>
+                
+                <div class="stat-card perdidos">
+                    <div class="stat-number">{{ stats.perdidos }}</div>
+                    <div class="stat-label">Mascotas Perdidas</div>
+                    <div class="stat-icon">🔍</div>
+                </div>
+                
+                <div class="stat-card encontrados">
+                    <div class="stat-number">{{ stats.encontrados }}</div>
+                    <div class="stat-label">Mascotas Encontradas</div>
+                    <div class="stat-icon">🏠</div>
+                </div>
+                
+                <div class="stat-card reunidos">
+                    <div class="stat-number">{{ stats.reunidos }}</div>
+                    <div class="stat-label">Familias Reunidas</div>
+                    <div class="stat-icon">❤️</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cómo Funciona -->
+    <div class="how-it-works-section">
+        <div class="container">
+            <h2 class="section-title">🚀 ¿Cómo Funciona?</h2>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-icon">📱</div>
+                    <h3>Reporta</h3>
+                    <p>Crea un reporte detallado de tu mascota perdida o de una mascota que encontraste, incluyendo fotos y ubicación.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-icon">🌍</div>
+                    <h3>Comparte</h3>
+                    <p>Tu reporte se publica en nuestra plataforma y la comunidad puede verlo, compartirlo y ayudar en la búsqueda.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-icon">🤝</div>
+                    <h3>Conecta</h3>
+                    <p>Cuando alguien tenga información, pueden contactarte directamente a través de la plataforma.</p>
+                </div>
+                
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-icon">🏡</div>
+                    <h3>Reúne</h3>
+                    <p>¡Celebra el reencuentro! Marca el reporte como cerrado cuando la mascota regrese a casa.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Funcionalidades -->
+    <div class="features-section">
+        <div class="container">
+            <h2 class="section-title">✨ Características Principales</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📍</div>
+                    <h3>Geolocalización Precisa</h3>
+                    <p>Reporta la ubicación exacta donde se perdió o se encontró la mascota para búsquedas más eficientes.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📸</div>
+                    <h3>Galería de Fotos</h3>
+                    <p>Sube múltiples fotos para ayudar a identificar mejor a las mascotas y aumentar las posibilidades de reconocimiento.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Notificaciones Inteligentes</h3>
+                    <p>Recibe alertas de reportes cercanos a tu ubicación para ayudar a mascotas en tu área.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🏷️</div>
+                    <h3>Filtros Avanzados</h3>
+                    <p>Busca por raza, tamaño, color, zona y fecha para encontrar información específica rápidamente.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💬</div>
+                    <h3>Sistema de Comentarios</h3>
+                    <p>La comunidad puede dejar comentarios con pistas, avistamientos y información útil.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3>Perfiles de Usuario</h3>
+                    <p>Personaliza tu perfil y configura tus preferencias de notificación para una mejor experiencia.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información sobre Cachorros -->
+    <div class="puppy-info-section">
+        <div class="container">
+            <h2 class="section-title">🐶 Todo sobre Cachorros</h2>
+            <p class="section-subtitle">Información esencial para entender mejor a tu mascota y aumentar las posibilidades de encontrarla</p>
+            
+            <!-- Comportamiento de Cachorros -->
+            <div class="info-subsection">
+                <h3 class="subsection-title">
+                    <span class="subsection-icon">🧠</span>
+                    Comportamiento cuando se pierden
+                </h3>
+                
+                <div class="behavior-grid">
+                    <div class="behavior-card">
+                        <div class="behavior-icon">😰</div>
+                        <h4>Primeras 24 horas</h4>
+                        <p><strong>Pánico y desorientación:</strong> Los perros suelen esconderse en lugares cercanos como arbustos, debajo de autos o estructuras. Raramente se alejan más de 1-2 km inicialmente.</p>
+                    </div>
+                    
+                    <div class="behavior-card">
+                        <div class="behavior-icon">🏃‍♂️</div>
+                        <h4>Modo supervivencia</h4>
+                        <p><strong>Instinto de huida:</strong> Pueden evitar a personas conocidas por miedo. Su comportamiento cambia completamente y pueden no responder a su nombre.</p>
+                    </div>
+                    
+                    <div class="behavior-card">
+                        <div class="behavior-icon">🌙</div>
+                        <h4>Actividad nocturna</h4>
+                        <p><strong>Búsqueda de comida:</strong> Se vuelven más activos durante la noche para buscar agua y comida, especialmente cerca de basureros o casas.</p>
+                    </div>
+                    
+                    <div class="behavior-card">
+                        <div class="behavior-icon">🏠</div>
+                        <h4>Búsqueda de refugio</h4>
+                        <p><strong>Lugares seguros:</strong> Buscan espacios cerrados y cálidos como garages abiertos, patios traseros, o debajo de porches.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dónde buscar -->
+            <div class="info-subsection">
+                <h3 class="subsection-title">
+                    <span class="subsection-icon">🔍</span>
+                    Dónde buscar efectivamente
+                </h3>
+                
+                <div class="search-areas">
+                    <div class="search-category">
+                        <h4>🏡 Zona inmediata (0-500m)</h4>
+                        <ul class="search-list">
+                            <li>Debajo de autos estacionados</li>
+                            <li>Arbustos y jardines densos</li>
+                            <li>Garages abiertos</li>
+                            <li>Patios de vecinos</li>
+                            <li>Alcantarillas y drenajes</li>
+                            <li>Construcciones abandonadas</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="search-category">
+                        <h4>🌳 Área expandida (500m-2km)</h4>
+                        <ul class="search-list">
+                            <li>Parques y áreas verdes</li>
+                            <li>Escuelas (especialmente patios)</li>
+                            <li>Cementerios</li>
+                            <li>Mercados y áreas comerciales</li>
+                            <li>Hospitales veterinarios</li>
+                            <li>Refugios de animales</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="search-category">
+                        <h4>🏪 Puntos de atracción</h4>
+                        <ul class="search-list">
+                            <li>Restaurantes y puestos de comida</li>
+                            <li>Mercados de pulgas</li>
+                            <li>Áreas de basureros</li>
+                            <li>Fuentes de agua (ríos, lagos)</li>
+                            <li>Otros perros (pueden seguir la manada)</li>
+                            <li>Lugares que solían visitar contigo</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Técnicas de búsqueda -->
+            <div class="info-subsection">
+                <h3 class="subsection-title">
+                    <span class="subsection-icon">🎯</span>
+                    Técnicas efectivas de búsqueda
+                </h3>
+                
+                <div class="techniques-grid">
+                    <div class="technique-card">
+                        <div class="technique-number">1</div>
+                        <h4>Búsqueda sistemática</h4>
+                        <p>Divide el área en cuadrantes y búsca sistemáticamente. Marca las zonas ya revisadas en un mapa.</p>
+                    </div>
+                    
+                    <div class="technique-card">
+                        <div class="technique-number">2</div>
+                        <h4>Horarios estratégicos</h4>
+                        <p>Busca temprano en la mañana (5-7 AM) y al atardecer (6-8 PM) cuando hay menos ruido y actividad.</p>
+                    </div>
+                    
+                    <div class="technique-card">
+                        <div class="technique-number">3</div>
+                        <h4>Usa su comida favorita</h4>
+                        <p>Lleva treats con olor fuerte o su comida favorita. El olor puede atraerlos desde lejos.</p>
+                    </div>
+                    
+                    <div class="technique-card">
+                        <div class="technique-number">4</div>
+                        <h4>No grites su nombre</h4>
+                        <p>Habla en tono normal y calmado. Los gritos pueden asustarlo más y hacer que se aleje.</p>
+                    </div>
+                    
+                    <div class="technique-card">
+                        <div class="technique-number">5</div>
+                        <h4>Deja tu olor</h4>
+                        <p>Coloca ropa usada tuya cerca de casa. Tu olor puede guiarlo de regreso.</p>
+                    </div>
+                    
+                    <div class="technique-card">
+                        <div class="technique-number">6</div>
+                        <h4>Red de voluntarios</h4>
+                        <p>Organiza grupos de búsqueda con familiares y amigos. Más ojos cubren más territorio.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prevención -->
+            <div class="info-subsection">
+                <h3 class="subsection-title">
+                    <span class="subsection-icon">🛡️</span>
+                    Prevención: Cómo evitar que se pierdan
+                </h3>
+                
+                <div class="prevention-grid">
+                    <div class="prevention-card">
+                        <div class="prevention-icon">🏷️</div>
+                        <h4>Identificación visible</h4>
+                        <ul>
+                            <li>Collar con placa de identificación actualizada</li>
+                            <li>Microchip registrado con datos actuales</li>
+                            <li>Collar GPS para perros aventureros</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="prevention-card">
+                        <div class="prevention-icon">🏠</div>
+                        <h4>Seguridad en casa</h4>
+                        <ul>
+                            <li>Revisa cercas y portones regularmente</li>
+                            <li>Asegura puertas y ventanas</li>
+                            <li>Crea un área segura en el jardín</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="prevention-card">
+                        <div class="prevention-icon">🦮</div>
+                        <h4>Entrenamiento básico</h4>
+                        <ul>
+                            <li>Comando "ven" o "aquí" bien establecido</li>
+                            <li>Socialización adecuada desde cachorro</li>
+                            <li>Evitar que salga corriendo por la puerta</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="prevention-card">
+                        <div class="prevention-icon">⚠️</div>
+                        <h4>Situaciones de riesgo</h4>
+                        <ul>
+                            <li>Fuegos artificiales y tormentas (mantener adentro)</li>
+                            <li>Lugares muy concurridos sin correa</li>
+                            <li>Dejarlo solo en el auto</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Datos importantes -->
+            <div class="info-subsection">
+                <h3 class="subsection-title">
+                    <span class="subsection-icon">📊</span>
+                    Datos que debes saber
+                </h3>
+                
+                <div class="facts-grid">
+                    <div class="fact-card">
+                        <div class="fact-stat">93%</div>
+                        <p>de las mascotas se encuentran en las primeras 24 horas si se reportan inmediatamente</p>
+                    </div>
+                    
+                    <div class="fact-card">
+                        <div class="fact-stat">80%</div>
+                        <p>se encuentran dentro de un radio de 1 km de donde se perdieron inicialmente</p>
+                    </div>
+                    
+                    <div class="fact-card">
+                        <div class="fact-stat">2-4 AM</div>
+                        <p>es cuando más se mueven los perros perdidos buscando comida y agua</p>
+                    </div>
+                    
+                    <div class="fact-card">
+                        <div class="fact-stat">72 hrs</div>
+                        <p>es el tiempo crítico. Después de esto, pueden alejarse más buscando recursos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Consejos -->
+    <div class="tips-section">
+        <div class="container">
+            <h2 class="section-title">💡 Consejos Importantes</h2>
+            
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-icon">⚡</div>
+                    <h3>Actúa Rápido</h3>
+                    <p>Las primeras horas son cruciales. Reporta inmediatamente cuando una mascota se pierda o sea encontrada.</p>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-icon">📝</div>
+                    <h3>Detalles Precisos</h3>
+                    <p>Proporciona la mayor cantidad de detalles posibles: características físicas, comportamiento, collar, etc.</p>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-icon">📢</div>
+                    <h3>Comparte Ampliamente</h3>
+                    <p>Comparte el reporte en redes sociales y con vecinos para amplificar el alcance de la búsqueda.</p>
+                </div>
+                
+                <div class="tip-card">
+                    <div class="tip-icon">🤲</div>
+                    <h3>Mantén la Calma</h3>
+                    <p>Si encuentras una mascota, acércate con cuidado y paciencia. Puede estar asustada o desorientada.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>¿Listo para Ayudar?</h2>
+                <p>Únete a nuestra comunidad y ayuda a reunir familias</p>
+                <div class="cta-buttons">
+                    <a href="{% url 'reportsservice:crear_reporte' %}" class="btn btn-primary">
+                        <span>📝</span>
+                        Crear Reporte
+                    </a>
+                    <a href="{% url 'reportsservice:reportes' %}" class="btn btn-outline">
+                        <span>🔍</span>
+                        Ver Reportes
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Animación de contadores
+    document.addEventListener('DOMContentLoaded', function() {
+        const counters = document.querySelectorAll('.stat-number');
+        
+        counters.forEach(counter => {
+            const target = parseInt(counter.textContent);
+            counter.textContent = '0';
+            
+            const increment = target / 50;
+            let current = 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    counter.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    counter.textContent = Math.ceil(current);
+                }
+            }, 30);
+        });
+    });
+</script>
+{% endblock %}

@@ -347,9 +347,31 @@ function initFormValidation() {
     
     if (form) {
         form.addEventListener('submit', function(e) {
-            if (!validateAllSteps()) {
+            // Validación básica - solo verificar campos críticos
+            const tipoReporte = document.querySelector('input[name="tipo_reporte"]:checked');
+            const nombrePerro = document.querySelector('input[name="nombre_perro"]');
+            const latitud = document.querySelector('input[name="latitud"]');
+            const longitud = document.querySelector('input[name="longitud"]');
+            
+            let hasErrors = false;
+            
+            if (!tipoReporte) {
+                showNotification('Por favor selecciona el tipo de reporte', 'error');
+                hasErrors = true;
+            }
+            
+            if (!nombrePerro || !nombrePerro.value.trim()) {
+                showNotification('El nombre de la mascota es requerido', 'error');
+                hasErrors = true;
+            }
+            
+            if (!latitud || !longitud || !latitud.value || !longitud.value) {
+                showNotification('Las coordenadas son requeridas. Usa el botón de ubicación.', 'error');
+                hasErrors = true;
+            }
+            
+            if (hasErrors) {
                 e.preventDefault();
-                showNotification('Por favor completa todos los campos requeridos', 'error');
                 return false;
             }
             
@@ -361,6 +383,16 @@ function initFormValidation() {
             if (submitBtn) {
                 submitBtn.classList.add('loading');
                 submitBtn.innerHTML = '<span>📝</span> Creando reporte...';
+                submitBtn.disabled = true;
+                
+                // Habilitar el botón después de 10 segundos como fallback
+                setTimeout(() => {
+                    if (submitBtn.disabled) {
+                        submitBtn.disabled = false;
+                        submitBtn.classList.remove('loading');
+                        submitBtn.innerHTML = '<span>📝</span> Crear Reporte';
+                    }
+                }, 10000);
             }
         });
     }

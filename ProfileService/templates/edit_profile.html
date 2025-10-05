@@ -116,15 +116,15 @@
             </div>
 
             <div class="form-row">
-                <div class="form-group">
+                <div class="form-group geocoding-controls">
                     <label class="checkbox-wrapper geocoding-option">
-                        <input type="checkbox" name="geocoding_automatico" value="1" id="geocoding_automatico">
+                        <input type="checkbox" name="direccion_automatica" value="1" id="direccion_automatica">
                         <span class="checkmark"></span>
-                        Obtener coordenadas automáticamente desde la dirección
+                        Obtener dirección automáticamente desde las coordenadas
                     </label>
-                    <button type="button" id="btn-geocodificar" class="btn btn-secondary">
-                        📍 Obtener Coordenadas Ahora
-                    </button>
+                    <small class="help-text">
+                        Se activará cuando cambies las coordenadas y no tengas dirección
+                    </small>
                 </div>
             </div>
         </div>
@@ -207,10 +207,17 @@
                     </div>
                 </div>
                 
-                <button type="button" class="btn btn-outline" id="get-location-btn">
-                    <span>📍</span>
-                    Usar Ubicación Actual
-                </button>
+                <div class="location-buttons">
+                    <button type="button" class="btn btn-outline" id="get-location-btn">
+                        <span>📍</span>
+                        Usar Ubicación Actual
+                    </button>
+                    
+                    <button type="button" class="btn btn-secondary" id="btn-obtener-direccion">
+                        <span>🏠</span>
+                        Obtener Dirección desde Coordenadas
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -267,46 +274,63 @@
 {% block extra_js %}
 <script src="{% static 'js/edit_profile.js' %}"></script>
 <script>
-    // Funcionalidad de geocoding
+    // Funcionalidad de obtener dirección desde coordenadas
     document.addEventListener('DOMContentLoaded', function() {
-        const btnGeocodificar = document.getElementById('btn-geocodificar');
         const direccionInput = document.getElementById('direccion');
         const latitudInput = document.getElementById('latitud_preferida');
         const longitudInput = document.getElementById('longitud_preferida');
+        const btnObtenerDireccion = document.getElementById('btn-obtener-direccion');
         
-        if (btnGeocodificar) {
-            btnGeocodificar.addEventListener('click', function() {
-                const direccion = direccionInput.value.trim();
+        if (btnObtenerDireccion) {
+            btnObtenerDireccion.addEventListener('click', function() {
+                const latitud = latitudInput ? latitudInput.value.trim() : '';
+                const longitud = longitudInput ? longitudInput.value.trim() : '';
                 
-                if (!direccion) {
-                    alert('Por favor ingresa una dirección');
+                if (!latitud || !longitud) {
+                    alert('Por favor ingresa las coordenadas (latitud y longitud)');
+                    return;
+                }
+                
+                // Validar formato de coordenadas
+                const lat = parseFloat(latitud);
+                const lng = parseFloat(longitud);
+                
+                if (isNaN(lat) || isNaN(lng)) {
+                    alert('Las coordenadas deben ser números válidos');
+                    return;
+                }
+                
+                if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+                    alert('Coordenadas fuera de rango válido:\nLatitud: -90 a 90\nLongitud: -180 a 180');
                     return;
                 }
                 
                 // Mostrar estado de carga
-                const originalText = btnGeocodificar.innerHTML;
-                btnGeocodificar.innerHTML = '🔄 Obteniendo...';
-                btnGeocodificar.disabled = true;
+                const originalText = btnObtenerDireccion.innerHTML;
+                btnObtenerDireccion.innerHTML = '🔄 Obteniendo dirección...';
+                btnObtenerDireccion.disabled = true;
                 
                 // Realizar petición AJAX
-                fetch('{% url "ProfileService:geocodificar_direccion" %}', {
+                fetch('{% url "ProfileService:obtener_direccion" %}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
                     },
                     body: JSON.stringify({
-                        direccion: direccion
+                        latitud: lat,
+                        longitud: lng
                     })
                 })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Actualizar campos de coordenadas
-                        if (latitudInput) latitudInput.value = data.latitud;
-                        if (longitudInput) longitudInput.value = data.longitud;
+                        // Actualizar campo de dirección
+                        if (direccionInput) {
+                            direccionInput.value = data.direccion;
+                        }
                         
-                        alert(`Coordenadas obtenidas exitosamente:\nLatitud: ${data.latitud}\nLongitud: ${data.longitud}\nUbicación: ${data.display_name}`);
+                        alert(`Dirección obtenida exitosamente:\n${data.direccion}\n\nDirección completa:\n${data.direccion_completa}`);
                     } else {
                         alert(`Error: ${data.error}`);
                     }
@@ -317,8 +341,8 @@
                 })
                 .finally(() => {
                     // Restaurar botón
-                    btnGeocodificar.innerHTML = originalText;
-                    btnGeocodificar.disabled = false;
+                    btnObtenerDireccion.innerHTML = originalText;
+                    btnObtenerDireccion.disabled = false;
                 });
             });
         }

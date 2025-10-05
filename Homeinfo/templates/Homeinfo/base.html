@@ -20,7 +20,7 @@
                 <a href="{% url 'Homeinfo:home' %}">Inicio</a>
                 <a href="{% url 'reportsservice:reportes' %}">Reportes</a>
                 <a href="#">Mapa</a>
-                <a href="#">Educacion</a>
+                <a href="{% url 'Homeinfo:informacion' %}">Información</a>
 
                 {% if user.is_authenticated %}
                     <div class="user-menu">
@@ -59,6 +59,7 @@
                 <!-- Enlaces de navegación -->
                 <div class="footer-links">
                     <div class="footer-links-group">
+                        <a href="{% url 'Homeinfo:informacion' %}" class="footer-link">Información</a>
                         <a href="#" class="footer-link">Privacidad</a>
                         <a href="#" class="footer-link">Contacto</a>
                         <a href="#" class="footer-link">Términos</a>
