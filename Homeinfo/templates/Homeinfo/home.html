@@ -106,6 +106,7 @@
         <p class="section-subtitle">Ayúdanos a reunir a estas mascotas con sus dueños</p>
         
         <div class="pets-grid">
+            
             {% if reportes_recientes %}
                 {% for reporte in reportes_recientes %}
                 <div class="pet-card">
@@ -114,15 +115,24 @@
                             {% if reporte.tipo_reporte == 'perdido' %}Perdido{% else %}Encontrado{% endif %}
                         </div>
                         {% if reporte.fotos.first %}
-                            <img src="{{ reporte.fotos.first.foto.url }}" alt="{{ reporte.nombre_perro }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img src="{{ reporte.fotos.first.imagen.url }}" alt="{{ reporte.nombre_perro }}" 
+                                 style="width: 100%; height: 100%; object-fit: cover;" 
+                                 onerror="console.log('Error cargando imagen:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 100%; height: 100%; justify-content: center; align-items: center; background: #f8f9fa;">
+                                <span style="font-size: 80px;">🐕</span>
+                            </div>
                         {% else %}
-                            <span style="font-size: 80px;">🐕</span>
+                            <!-- Imagen por defecto cuando no hay fotos -->
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                <span style="font-size: 80px; color: white;">🐕</span>
+                            </div>
                         {% endif %}
                     </div>
                     <div class="pet-info">
                         <div class="pet-name">{{ reporte.nombre_perro }}</div>
                         <div class="pet-breed">{{ reporte.raza.nombre|default:"Sin raza especificada" }}</div>
-                        <div class="pet-location">📍 {{ reporte.zona }}, Juárez</div>
+                        <div class="pet-location">{{ reporte.zona }}, Juárez</div>
+                        <div class="pet-last-seen">Última vez {% if reporte.tipo_reporte == 'perdido' %}vista{% else %}visto{% endif %}: {{ reporte.direccion|truncatechars:30 }}</div>
                         <div class="pet-actions">
                             <a href="{% url 'reportsservice:detalle_reporte' reporte.id %}" class="pet-btn pet-btn-primary">Ver Detalles</a>
                             <a href="{% url 'reportsservice:detalle_reporte' reporte.id %}" class="pet-btn pet-btn-secondary">
@@ -132,55 +142,6 @@
                     </div>
                 </div>
                 {% endfor %}
-            {% else %}
-                <!-- Tarjetas de ejemplo si no hay reportes -->
-                <div class="pet-card">
-                    <div class="pet-image">
-                        <div class="pet-status">Perdido</div>
-                        <span style="font-size: 80px;">🐕‍🦺</span>
-                    </div>
-                    <div class="pet-info">
-                        <div class="pet-name">Gigi</div>
-                        <div class="pet-breed">Poodle</div>
-                        <div class="pet-location">📍 Centro, Juárez</div>
-                        <div class="pet-actions">
-                            <a href="{% url 'reportsservice:reportes' %}" class="pet-btn pet-btn-primary">Ver Detalles</a>
-                            <a href="{% url 'reportsservice:crear_reporte' %}" class="pet-btn pet-btn-secondary">Contactar</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pet-card">
-                    <div class="pet-image">
-                        <div class="pet-status found">Encontrado</div>
-                        <span style="font-size: 80px;">🐕</span>
-                    </div>
-                    <div class="pet-info">
-                        <div class="pet-name">Max</div>
-                        <div class="pet-breed">Chihuahua</div>
-                        <div class="pet-location">📍 San Lorenzo, Juárez</div>
-                        <div class="pet-actions">
-                            <a href="{% url 'reportsservice:reportes' %}" class="pet-btn pet-btn-primary">Ver Detalles</a>
-                            <a href="{% url 'reportsservice:crear_reporte' %}" class="pet-btn pet-btn-secondary">¿Es Tuyo?</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pet-card">
-                    <div class="pet-image">
-                        <div class="pet-status">Perdido</div>
-                        <span style="font-size: 80px;">�</span>
-                    </div>
-                    <div class="pet-info">
-                        <div class="pet-name">Maya</div>
-                        <div class="pet-breed">Husky Siberiano</div>
-                        <div class="pet-location">📍 Centro, Juárez</div>
-                        <div class="pet-actions">
-                            <a href="{% url 'reportsservice:reportes' %}" class="pet-btn pet-btn-primary">Ver Detalles</a>
-                            <a href="{% url 'reportsservice:crear_reporte' %}" class="pet-btn pet-btn-secondary">Contactar</a>
-                        </div>
-                    </div>
-                </div>
             {% endif %}
         </div>
     </div>
