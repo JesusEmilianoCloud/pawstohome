@@ -19,7 +19,7 @@
             <nav class="header-nav">
                 <a href="{% url 'Homeinfo:home' %}">Inicio</a>
                 <a href="{% url 'reportsservice:reportes' %}">Reportes</a>
-                <a href="#">Mapa</a>
+                <a href="{% url 'Mapservice:mapa_interactivo' %}">Mapa</a>
                 <a href="{% url 'Homeinfo:informacion' %}">Información</a>
 
                 {% if user.is_authenticated %}

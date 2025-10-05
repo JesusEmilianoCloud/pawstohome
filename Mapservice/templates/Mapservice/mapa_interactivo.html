@@ -1,0 +1,143 @@
+{% extends 'Homeinfo/base.html' %}
+{% load static %}
+
+{% block title %}Mapa Interactivo - PawsToHome{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+      crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="{% static 'css/mapa_interactivo.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="map-container">
+    <!-- Panel de Filtros -->
+    <div class="filters-panel">
+        <div class="panel-header">
+            <h2 class="panel-title">
+                <span class="location-icon">📍</span>
+                Mapa Interactivo
+            </h2>
+            <p class="panel-subtitle">Encuentra perros perdidos y encontrados en Ciudad Juárez</p>
+        </div>
+
+        <!-- Tipo de Reporte -->
+        <div class="filter-group">
+            <h3 class="filter-title">Tipo de reporte</h3>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-type="">Todos</button>
+                <button class="filter-btn perdidos" data-type="perdido">Perdidos</button>
+                <button class="filter-btn encontrados" data-type="encontrado">Encontrados</button>
+            </div>
+        </div>
+
+        <!-- Búsqueda -->
+        <div class="filter-group">
+            <h3 class="filter-title">Buscar por nombre o descripción</h3>
+            <div class="search-input-group">
+                <input type="text" id="busqueda" placeholder="Ej: Max, Chihuahua..." class="search-input">
+                <button id="btn-buscar" class="search-btn">🔍</button>
+            </div>
+        </div>
+
+        <!-- Filtro por Raza -->
+        <div class="filter-group">
+            <h3 class="filter-title">Raza</h3>
+            <select id="filtro-raza" class="filter-select">
+                <option value="">Todas las razas</option>
+                {% for raza in razas %}
+                <option value="{{ raza.id }}">{{ raza.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Radio de Búsqueda -->
+        <div class="filter-group">
+            <h3 class="filter-title">Radio de búsqueda</h3>
+            <div class="radio-control">
+                <input type="range" id="radio-slider" min="1" max="50" value="10" class="radio-slider">
+                <div class="radio-display">
+                    <span id="radio-value">10</span> km a la redonda
+                </div>
+            </div>
+            <button id="btn-ubicacion" class="location-btn">
+                📍 Usar mi ubicación
+            </button>
+            <div class="location-info">
+                <small>💡 Permite el acceso a tu ubicación para ver reportes cercanos</small>
+            </div>
+        </div>
+
+        <!-- Filtro por Fecha -->
+        <div class="filter-group">
+            <h3 class="filter-title">Fecha de reporte</h3>
+            <div class="date-buttons">
+                <button class="date-btn active" data-period="">Todos</button>
+                <button class="date-btn" data-period="today">Hoy</button>
+                <button class="date-btn" data-period="week">Esta semana</button>
+                <button class="date-btn" data-period="month">Este mes</button>
+            </div>
+            <div class="date-inputs">
+                <input type="date" id="fecha-desde" class="date-input" placeholder="Desde">
+                <input type="date" id="fecha-hasta" class="date-input" placeholder="Hasta">
+            </div>
+        </div>
+
+        <!-- Reportes Cercanos -->
+        <div class="nearby-reports">
+            <h3 class="reports-title">
+                <span class="reports-count" id="reports-count">0</span>
+                Reportes Cercanos
+            </h3>
+            <div class="reports-list" id="reports-list">
+                <!-- Los reportes se cargarán aquí dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mapa -->
+    <div class="map-wrapper">
+        <div id="mapa" class="leaflet-map"></div>
+        
+        <!-- Leyenda del Mapa -->
+        <div class="map-legend">
+            <h4>Leyenda</h4>
+            <div class="legend-item">
+                <span class="legend-icon perdido">📍</span>
+                <span>Perros perdidos</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-icon encontrado">📍</span>
+                <span>Perros encontrados</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Detalles del Reporte -->
+<div id="modal-reporte" class="modal">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <div id="modal-body">
+            <!-- El contenido se cargará dinámicamente -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+        crossorigin=""></script>
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+        crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+<!-- JavaScript del mapa -->
+<script src="{% static 'js/mapa_interactivo.js' %}"></script>
+{% endblock %}
