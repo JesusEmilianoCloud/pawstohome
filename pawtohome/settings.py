@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     #DEPENDENCIES
+    'storages',
 
     #APPS ,
     'loginservice',
@@ -181,5 +182,70 @@ SITE_ID = int(os.getenv("SITE_ID"))
 LOGIN_URL = 'loginservice:login-register'
 LOGIN_REDIRECT_URL = 'Homeinfo:home'
 LOGOUT_REDIRECT_URL = 'Homeinfo:home'
+
+# ========== CLOUDFLARE R2 STORAGE CONFIGURATION ==========
+
+# Configuración de Cloudflare R2
+USE_CLOUDFLARE_R2 = os.getenv('USE_CLOUDFLARE_R2', 'False').lower() == 'true'
+
+if USE_CLOUDFLARE_R2:
+    # Credenciales de Cloudflare R2
+    CLOUDFLARE_R2_ACCESS_KEY_ID = os.getenv('CLOUDFLARE_R2_ACCESS_KEY_ID')
+    CLOUDFLARE_R2_SECRET_ACCESS_KEY = os.getenv('CLOUDFLARE_R2_SECRET_ACCESS_KEY')
+    CLOUDFLARE_R2_BUCKET_NAME = os.getenv('CLOUDFLARE_R2_BUCKET_NAME')
+    CLOUDFLARE_R2_ENDPOINT_URL = os.getenv('CLOUDFLARE_R2_ENDPOINT_URL')
+    CLOUDFLARE_R2_CUSTOM_DOMAIN = os.getenv('CLOUDFLARE_R2_CUSTOM_DOMAIN', None)
+    
+    # Configuración de AWS para Cloudflare R2 (compatible con S3)
+    AWS_ACCESS_KEY_ID = CLOUDFLARE_R2_ACCESS_KEY_ID
+    AWS_SECRET_ACCESS_KEY = CLOUDFLARE_R2_SECRET_ACCESS_KEY
+    AWS_STORAGE_BUCKET_NAME = CLOUDFLARE_R2_BUCKET_NAME
+    AWS_S3_ENDPOINT_URL = CLOUDFLARE_R2_ENDPOINT_URL
+    AWS_S3_REGION_NAME = 'auto'  # Cloudflare R2 usa 'auto'
+    
+    # Configuración de URLs y archivos
+    AWS_S3_CUSTOM_DOMAIN = CLOUDFLARE_R2_CUSTOM_DOMAIN
+    AWS_DEFAULT_ACL = None  # R2 no requiere ACL explícito
+    AWS_QUERYSTRING_AUTH = False  # URLs públicas sin autenticación
+    AWS_S3_FILE_OVERWRITE = False  # No sobrescribir archivos existentes
+    
+    # Configurar storages: Media en R2, Static local
+    STORAGES = {
+        "default": {
+            "BACKEND": "pawtohome.storage_backends.CloudflareR2MediaStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    
+    # URLs: Media en R2, Static local
+    if CLOUDFLARE_R2_CUSTOM_DOMAIN:
+        MEDIA_URL = f"https://{CLOUDFLARE_R2_CUSTOM_DOMAIN}/media/"
+    else:
+        # Usar URLs del endpoint de R2 solo para media
+        base_url = CLOUDFLARE_R2_ENDPOINT_URL.rstrip('/')
+        bucket_name = CLOUDFLARE_R2_BUCKET_NAME
+        MEDIA_URL = f"{base_url}/{bucket_name}/media/"
+    
+    # Static URLs permanecen locales
+    STATIC_URL = '/static/'
+    
+    print(f"✅ Cloudflare R2 configurado para MEDIA - Bucket: {CLOUDFLARE_R2_BUCKET_NAME}")
+    print(f"📁 MEDIA_URL: {MEDIA_URL}")
+    print(f"🎨 STATIC_URL: {STATIC_URL} (local)")
+
+else:
+    # Configuración de almacenamiento local (desarrollo)
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
+    
+    print("📁 Usando almacenamiento local para desarrollo")
 
 
