@@ -29,7 +29,6 @@ urlpatterns = [
     path('reports/', include('reportsservice.urls')),
     path('maps/', include('Mapservice.urls')),
     path('profile/', include('ProfileService.urls')),
-    path('home/', include('Homeinfo.urls')),  # Ruta alternativa al servicio de home
     
     # Admin
     path('admin/', admin.site.urls),
