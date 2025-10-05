@@ -70,6 +70,13 @@
                     <span>{{ profile_user.phone_number }}</span>
                 </div>
                 {% endif %}
+
+                {% if configuracion and configuracion.tiene_direccion %}
+                <div class="info-item">
+                    <label>Dirección</label>
+                    <span class="address-text">{{ configuracion.direccion }}</span>
+                </div>
+                {% endif %}
                 
                 <div class="info-item">
                     <label>Miembro desde</label>

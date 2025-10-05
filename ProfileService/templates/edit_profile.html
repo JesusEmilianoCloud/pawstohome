@@ -102,6 +102,31 @@
                            value="{{ user.phone_number }}" class="form-control">
                 </div>
             </div>
+
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="direccion">Dirección</label>
+                    <textarea id="direccion" name="direccion" 
+                              class="form-control" rows="3" 
+                              placeholder="Ingresa tu dirección completa (calle, número, colonia, ciudad, estado)">{{ configuracion.direccion|default:"" }}</textarea>
+                    <small class="help-text">
+                        Esta dirección se puede usar para calcular automáticamente tus coordenadas de notificación
+                    </small>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="checkbox-wrapper geocoding-option">
+                        <input type="checkbox" name="geocoding_automatico" value="1" id="geocoding_automatico">
+                        <span class="checkmark"></span>
+                        Obtener coordenadas automáticamente desde la dirección
+                    </label>
+                    <button type="button" id="btn-geocodificar" class="btn btn-secondary">
+                        📍 Obtener Coordenadas Ahora
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Configuraciones de Notificaciones -->
@@ -241,4 +266,62 @@
 
 {% block extra_js %}
 <script src="{% static 'js/edit_profile.js' %}"></script>
+<script>
+    // Funcionalidad de geocoding
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnGeocodificar = document.getElementById('btn-geocodificar');
+        const direccionInput = document.getElementById('direccion');
+        const latitudInput = document.getElementById('latitud_preferida');
+        const longitudInput = document.getElementById('longitud_preferida');
+        
+        if (btnGeocodificar) {
+            btnGeocodificar.addEventListener('click', function() {
+                const direccion = direccionInput.value.trim();
+                
+                if (!direccion) {
+                    alert('Por favor ingresa una dirección');
+                    return;
+                }
+                
+                // Mostrar estado de carga
+                const originalText = btnGeocodificar.innerHTML;
+                btnGeocodificar.innerHTML = '🔄 Obteniendo...';
+                btnGeocodificar.disabled = true;
+                
+                // Realizar petición AJAX
+                fetch('{% url "ProfileService:geocodificar_direccion" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        direccion: direccion
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Actualizar campos de coordenadas
+                        if (latitudInput) latitudInput.value = data.latitud;
+                        if (longitudInput) longitudInput.value = data.longitud;
+                        
+                        alert(`Coordenadas obtenidas exitosamente:\nLatitud: ${data.latitud}\nLongitud: ${data.longitud}\nUbicación: ${data.display_name}`);
+                    } else {
+                        alert(`Error: ${data.error}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error de conexión. Intenta nuevamente.');
+                })
+                .finally(() => {
+                    // Restaurar botón
+                    btnGeocodificar.innerHTML = originalText;
+                    btnGeocodificar.disabled = false;
+                });
+            });
+        }
+    });
+</script>
 {% endblock %}

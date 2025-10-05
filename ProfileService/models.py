@@ -3,6 +3,8 @@ from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
 import uuid
 import os
+import requests
+import json
 
 def profile_photo_upload_path(instance, filename):
     """
@@ -38,6 +40,14 @@ class ConfiguracionUsuario(models.Model):
         null=True,
         verbose_name="Foto de Perfil",
         help_text="Foto de perfil del usuario (formatos admitidos: JPG, PNG, GIF)"
+    )
+    
+    # Dirección del usuario
+    direccion = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Dirección",
+        help_text="Dirección completa del usuario"
     )
     
     # Configuraciones de notificaciones
@@ -121,3 +131,64 @@ class ConfiguracionUsuario(models.Model):
     def has_profile_photo(self):
         """Verifica si el usuario tiene foto de perfil"""
         return bool(self.foto_perfil)
+    
+    def geocodificar_direccion(self):
+        """
+        Convierte la dirección en coordenadas usando OpenStreetMap Nominatim API
+        Retorna un diccionario con lat, lon, o None si falla
+        """
+        if not self.direccion:
+            return None
+        
+        try:
+            # Usar Nominatim API (gratuito, no requiere API key)
+            url = "https://nominatim.openstreetmap.org/search"
+            params = {
+                'q': self.direccion,
+                'format': 'json',
+                'limit': 1,
+                'countrycodes': 'mx',  # Limitar a México
+                'addressdetails': 1
+            }
+            
+            headers = {
+                'User-Agent': 'PawsToHome/1.0 (geocoding for pet location service)'
+            }
+            
+            response = requests.get(url, params=params, headers=headers, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data:
+                    result = data[0]
+                    lat = float(result.get('lat'))
+                    lon = float(result.get('lon'))
+                    
+                    return {
+                        'latitud': lat,
+                        'longitud': lon,
+                        'display_name': result.get('display_name', ''),
+                        'success': True
+                    }
+            
+            return None
+            
+        except Exception as e:
+            print(f"Error en geocodificación: {e}")
+            return None
+    
+    def actualizar_coordenadas_desde_direccion(self):
+        """
+        Actualiza las coordenadas preferidas basándose en la dirección
+        """
+        if self.direccion:
+            resultado = self.geocodificar_direccion()
+            if resultado and resultado.get('success'):
+                self.latitud_preferida = resultado['latitud']
+                self.longitud_preferida = resultado['longitud']
+                return True
+        return False
+    
+    def tiene_direccion(self):
+        """Verifica si el usuario tiene dirección configurada"""
+        return bool(self.direccion)
