@@ -1,9 +1,14 @@
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 import math
+import logging
 from .models import Reporte, Avistamiento, Comentario, FotoReporte
+from .utils import upload_foto_reporte_to_r2
 from Homeinfo.models import Notificacion
 from ProfileService.models import ConfiguracionUsuario
+
+# Configurar logger
+logger = logging.getLogger(__name__)
 
 def calcular_distancia_haversine(lat1, lon1, lat2, lon2):
     """
@@ -127,3 +132,17 @@ def validar_foto_principal(sender, instance, created, **kwargs):
         if not FotoReporte.objects.filter(reporte=instance.reporte, es_principal=True).exists():
             instance.es_principal = True
             instance.save(update_fields=['es_principal'])
+
+@receiver(post_save, sender=FotoReporte)
+def subir_foto_a_cloudflare_r2(sender, instance, created, **kwargs):
+    """
+    Signal para subir automáticamente fotos de reportes a Cloudflare R2
+    """
+    if created:
+        # Intentar subir la imagen a Cloudflare R2 en segundo plano
+        try:
+            upload_foto_reporte_to_r2(instance, async_upload=True)
+        except Exception as e:
+            # Si hay error, solo loggearlo pero no interrumpir el proceso principal
+            logger.error(f"Error en signal de subida a R2 para FotoReporte {instance.id}: {str(e)}")
+            pass
