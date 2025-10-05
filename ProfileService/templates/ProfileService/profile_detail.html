@@ -55,6 +55,10 @@
                     <span>✏️</span>
                     Editar Perfil
                 </a>
+                <a href="{% url 'account_logout' %}" class="btn btn-secondary">
+                    <span>🚪</span>
+                    Cerrar Sesión
+                </a>
             </div>
         {% endif %}
     </div>
@@ -68,42 +72,42 @@
             
             <div class="info-list">
                 <div class="info-row">
-                    <label class="info-label">Name</label>
+                    <label class="info-label">Nombre</label>
                     <span class="info-value">{{ profile_user.first_name }} {{ profile_user.last_name }}</span>
                 </div>
                 
                 <div class="info-row">
-                    <label class="info-label">Email account</label>
-                    <span class="info-value">{{ profile_user.email|default:"No email provided" }}</span>
+                    <label class="info-label">Correo electrónico</label>
+                    <span class="info-value">{{ profile_user.email|default:"No se proporcionó correo" }}</span>
                 </div>
                 
                 {% if user == profile_user and profile_user.phone_number %}
                 <div class="info-row">
-                    <label class="info-label">Mobile number</label>
+                    <label class="info-label">Número móvil</label>
                     <span class="info-value">{{ profile_user.phone_number }}</span>
                 </div>
                 {% else %}
                 <div class="info-row">
-                    <label class="info-label">Mobile number</label>
-                    <span class="info-value info-placeholder">Add number</span>
+                    <label class="info-label">Número móvil</label>
+                    <span class="info-value info-placeholder">Agregar número</span>
                 </div>
                 {% endif %}
 
                 {% if configuracion and configuracion.tiene_direccion %}
                 <div class="info-row">
-                    <label class="info-label">Location</label>
+                    <label class="info-label">Ubicación</label>
                     <span class="info-value">{{ configuracion.direccion }}</span>
                 </div>
                 {% else %}
                 <div class="info-row">
-                    <label class="info-label">Location</label>
-                    <span class="info-value info-placeholder">Add location</span>
+                    <label class="info-label">Ubicación</label>
+                    <span class="info-value info-placeholder">Agregar ubicación</span>
                 </div>
                 {% endif %}
                 
-                <div class="info-item">
-                    <label>Miembro desde</label>
-                    <span>{{ profile_user.date_joined|date:"d M Y" }}</span>
+                <div class="info-row">
+                    <label class="info-label">Miembro desde</label>
+                    <span class="info-value">{{ profile_user.date_joined|date:"d M Y" }}</span>
                 </div>
             </div>
         </div>
@@ -115,33 +119,33 @@
                 Configuración de Notificaciones
             </h2>
             
-            <div class="config-grid">
-                <div class="config-item">
-                    <div class="config-label">
-                        <span class="config-icon">📧</span>
-                        Notificaciones por Email
+            <div class="settings-list">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-icon">📧</span>
+                        <span class="setting-label">Notificaciones por Email</span>
                     </div>
-                    <div class="config-status {% if configuracion.notificaciones_email %}active{% else %}inactive{% endif %}">
-                        {% if configuracion.notificaciones_email %}✓ Activado{% else %}✗ Desactivado{% endif %}
-                    </div>
-                </div>
-                
-                <div class="config-item">
-                    <div class="config-label">
-                        <span class="config-icon">🔔</span>
-                        Notificaciones Push
-                    </div>
-                    <div class="config-status {% if configuracion.notificaciones_push %}active{% else %}inactive{% endif %}">
-                        {% if configuracion.notificaciones_push %}✓ Activado{% else %}✗ Desactivado{% endif %}
+                    <div class="setting-status {% if configuracion.notificaciones_email %}enabled{% else %}disabled{% endif %}">
+                        {% if configuracion.notificaciones_email %}Activado{% else %}Desactivado{% endif %}
                     </div>
                 </div>
                 
-                <div class="config-item">
-                    <div class="config-label">
-                        <span class="config-icon">📍</span>
-                        Radio de Notificaciones
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-icon">🔔</span>
+                        <span class="setting-label">Notificaciones Push</span>
                     </div>
-                    <div class="config-value">
+                    <div class="setting-status {% if configuracion.notificaciones_push %}enabled{% else %}disabled{% endif %}">
+                        {% if configuracion.notificaciones_push %}Activado{% else %}Desactivado{% endif %}
+                    </div>
+                </div>
+                
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-icon">📍</span>
+                        <span class="setting-label">Radio de Notificaciones</span>
+                    </div>
+                    <div class="setting-value">
                         {{ configuracion.radio_notificaciones }} km
                     </div>
                 </div>
@@ -154,24 +158,24 @@
                 Tipos de Reportes
             </h2>
             
-            <div class="config-grid">
-                <div class="config-item">
-                    <div class="config-label">
-                        <span class="config-icon">🔍</span>
-                        Mascotas Perdidas
+            <div class="settings-list">
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-icon">🔍</span>
+                        <span class="setting-label">Mascotas Perdidas</span>
                     </div>
-                    <div class="config-status {% if configuracion.notificar_perdidos %}active{% else %}inactive{% endif %}">
-                        {% if configuracion.notificar_perdidos %}✓ Activado{% else %}✗ Desactivado{% endif %}
+                    <div class="setting-status {% if configuracion.notificar_perdidos %}enabled{% else %}disabled{% endif %}">
+                        {% if configuracion.notificar_perdidos %}Activado{% else %}Desactivado{% endif %}
                     </div>
                 </div>
                 
-                <div class="config-item">
-                    <div class="config-label">
-                        <span class="config-icon">🏠</span>
-                        Mascotas Encontradas
+                <div class="setting-row">
+                    <div class="setting-info">
+                        <span class="setting-icon">🏠</span>
+                        <span class="setting-label">Mascotas Encontradas</span>
                     </div>
-                    <div class="config-status {% if configuracion.notificar_encontrados %}active{% else %}inactive{% endif %}">
-                        {% if configuracion.notificar_encontrados %}✓ Activado{% else %}✗ Desactivado{% endif %}
+                    <div class="setting-status {% if configuracion.notificar_encontrados %}enabled{% else %}disabled{% endif %}">
+                        {% if configuracion.notificar_encontrados %}Activado{% else %}Desactivado{% endif %}
                     </div>
                 </div>
             </div>
@@ -184,21 +188,20 @@
                 Ubicación Preferida
             </h2>
             
-            <div class="location-info">
-                <div class="coordinates">
-                    <div class="coord-item">
-                        <label>Latitud</label>
-                        <span>{{ configuracion.latitud_preferida|floatformat:6 }}</span>
-                    </div>
-                    <div class="coord-item">
-                        <label>Longitud</label>
-                        <span>{{ configuracion.longitud_preferida|floatformat:6 }}</span>
-                    </div>
+            <div class="location-list">
+                <div class="location-row">
+                    <label class="location-label">Latitud</label>
+                    <span class="location-value">{{ configuracion.latitud_preferida|floatformat:6 }}</span>
                 </div>
                 
-                <div class="map-placeholder">
-                    <p>📍 Ubicación configurada</p>
-                    <small>Lat: {{ configuracion.latitud_preferida|floatformat:4 }}, Lon: {{ configuracion.longitud_preferida|floatformat:4 }}</small>
+                <div class="location-row">
+                    <label class="location-label">Longitud</label>
+                    <span class="location-value">{{ configuracion.longitud_preferida|floatformat:6 }}</span>
+                </div>
+                
+                <div class="location-summary">
+                    <span class="location-icon">📍</span>
+                    <span class="location-text">Ubicación configurada</span>
                 </div>
             </div>
         </div>
@@ -207,9 +210,10 @@
 
         {% if not configuracion and user == profile_user %}
         <div class="profile-section">
-            <div class="no-config-message">
-                <h3>🔧 Configuración no disponible</h3>
-                <p>No tienes una configuración de perfil establecida.</p>
+            <div class="empty-state">
+                <div class="empty-icon">🔧</div>
+                <h3 class="empty-title">Configuración no disponible</h3>
+                <p class="empty-description">No tienes una configuración de perfil establecida aún.</p>
                 <a href="{% url 'ProfileService:edit_profile' %}" class="btn btn-primary">
                     <span>⚙️</span>
                     Configurar Ahora
