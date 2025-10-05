@@ -118,38 +118,40 @@ def edit_profile_view(request):
             
             # Actualizar dirección
             nueva_direccion = request.POST.get('direccion', '').strip()
-            direccion_cambio = configuracion.direccion != nueva_direccion
-            
             if nueva_direccion:
                 configuracion.direccion = nueva_direccion
-                
-                # Si hay geocoding automático habilitado, intentar obtener coordenadas
-                geocoding_auto = 'geocoding_automatico' in request.POST
-                if geocoding_auto and direccion_cambio:
-                    if configuracion.actualizar_coordenadas_desde_direccion():
-                        messages.success(request, "Dirección actualizada y coordenadas obtenidas automáticamente.")
-                    else:
-                        messages.warning(request, "Dirección actualizada, pero no se pudieron obtener las coordenadas automáticamente.")
             else:
                 configuracion.direccion = None
             
-            # Actualizar ubicación preferida manualmente (solo si no se hizo geocoding automático)
-            if 'geocoding_automatico' not in request.POST:
-                latitud = request.POST.get('latitud_preferida')
-                longitud = request.POST.get('longitud_preferida')
+            # Actualizar ubicación preferida
+            latitud = request.POST.get('latitud_preferida')
+            longitud = request.POST.get('longitud_preferida')
+            coordenadas_cambio = (
+                configuracion.latitud_preferida != (float(latitud) if latitud else None) or
+                configuracion.longitud_preferida != (float(longitud) if longitud else None)
+            )
+            
+            if latitud and longitud:
+                try:
+                    configuracion.set_ubicacion_preferida(float(latitud), float(longitud))
+                    
+                    # Si hay obtención automática de dirección habilitada
+                    direccion_auto = 'direccion_automatica' in request.POST
+                    if direccion_auto and coordenadas_cambio and not nueva_direccion:
+                        if configuracion.actualizar_direccion_desde_coordenadas():
+                            messages.success(request, "Coordenadas actualizadas y dirección obtenida automáticamente.")
+                        else:
+                            messages.warning(request, "Coordenadas actualizadas, pero no se pudo obtener la dirección automáticamente.")
                 
-                if latitud and longitud:
-                    try:
-                        configuracion.set_ubicacion_preferida(float(latitud), float(longitud))
-                    except ValueError as e:
-                        messages.error(request, f"Error en las coordenadas: {str(e)}")
-                        return render(request, 'edit_profile.html', {
-                            'user': user,
-                            'configuracion': configuracion
-                        })
-                else:
-                    configuracion.latitud_preferida = None
-                    configuracion.longitud_preferida = None
+                except ValueError as e:
+                    messages.error(request, f"Error en las coordenadas: {str(e)}")
+                    return render(request, 'edit_profile.html', {
+                        'user': user,
+                        'configuracion': configuracion
+                    })
+            else:
+                configuracion.latitud_preferida = None
+                configuracion.longitud_preferida = None
             
             # Actualizar tipos de reportes
             configuracion.notificar_perdidos = 'notificar_perdidos' in request.POST
@@ -171,38 +173,49 @@ def edit_profile_view(request):
     return render(request, 'edit_profile.html', context)
 
 @login_required
-def geocodificar_direccion_ajax(request):
+def obtener_direccion_desde_coordenadas_ajax(request):
     """
-    Vista AJAX para geocodificar una dirección en tiempo real
+    Vista AJAX para obtener dirección desde coordenadas (geocodificación inversa)
     """
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            direccion = data.get('direccion', '').strip()
+            latitud = data.get('latitud')
+            longitud = data.get('longitud')
             
-            if not direccion:
+            if not latitud or not longitud:
                 return JsonResponse({
                     'success': False,
-                    'error': 'Dirección vacía'
+                    'error': 'Latitud y longitud son requeridas'
                 })
             
-            # Crear objeto temporal para usar el método de geocodificación
-            configuracion_temp = ConfiguracionUsuario()
-            configuracion_temp.direccion = direccion
+            try:
+                lat = float(latitud)
+                lon = float(longitud)
+            except ValueError:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Coordenadas inválidas'
+                })
             
-            resultado = configuracion_temp.geocodificar_direccion()
+            # Crear objeto temporal para usar el método de geocodificación inversa
+            configuracion_temp = ConfiguracionUsuario()
+            configuracion_temp.latitud_preferida = lat
+            configuracion_temp.longitud_preferida = lon
+            
+            resultado = configuracion_temp.geocodificar_coordenadas()
             
             if resultado:
                 return JsonResponse({
                     'success': True,
-                    'latitud': resultado['latitud'],
-                    'longitud': resultado['longitud'],
-                    'display_name': resultado['display_name']
+                    'direccion': resultado['direccion'],
+                    'direccion_completa': resultado['direccion_completa'],
+                    'componentes': resultado['componentes']
                 })
             else:
                 return JsonResponse({
                     'success': False,
-                    'error': 'No se pudo geocodificar la dirección'
+                    'error': 'No se pudo obtener la dirección para estas coordenadas'
                 })
                 
         except Exception as e:
