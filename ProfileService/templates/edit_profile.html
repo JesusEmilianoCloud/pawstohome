@@ -17,6 +17,57 @@
     <form method="post" class="profile-form" enctype="multipart/form-data">
         {% csrf_token %}
         
+        <!-- Foto de Perfil -->
+        <div class="form-section">
+            <h2 class="section-title">
+                <span class="section-icon">📸</span>
+                Foto de Perfil
+            </h2>
+            
+            <div class="photo-section">
+                <div class="current-photo">
+                    {% if configuracion and configuracion.has_profile_photo %}
+                        <img src="{{ configuracion.get_profile_photo_url }}" 
+                             alt="Foto actual" 
+                             class="profile-photo-preview">
+                        <p class="photo-label">Foto actual</p>
+                    {% else %}
+                        <div class="no-photo">
+                            <div class="no-photo-icon">👤</div>
+                            <p class="photo-label">Sin foto de perfil</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="photo-controls">
+                    <div class="form-group">
+                        <label for="foto_perfil" class="file-input-label">
+                            <span class="file-icon">📁</span>
+                            Cambiar Foto
+                        </label>
+                        <input type="file" 
+                               id="foto_perfil" 
+                               name="foto_perfil" 
+                               accept="image/jpeg,image/png,image/gif"
+                               class="file-input">
+                        <small class="help-text">
+                            Formatos: JPG, PNG, GIF (Máximo 5MB)
+                        </small>
+                    </div>
+                    
+                    {% if configuracion and configuracion.has_profile_photo %}
+                        <div class="form-group">
+                            <label class="checkbox-wrapper">
+                                <input type="checkbox" name="eliminar_foto" value="1">
+                                <span class="checkmark"></span>
+                                Eliminar foto actual
+                            </label>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
         <!-- Información Personal -->
         <div class="form-section">
             <h2 class="section-title">

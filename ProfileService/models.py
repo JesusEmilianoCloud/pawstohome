@@ -1,6 +1,20 @@
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
+import uuid
+import os
+
+def profile_photo_upload_path(instance, filename):
+    """
+    Función para generar la ruta de subida de las fotos de perfil
+    Organiza por ID de usuario y mantiene la extensión original
+    """
+    # Obtener la extensión del archivo
+    ext = filename.split('.')[-1]
+    # Generar nombre único
+    filename = f"profile_{instance.usuario.id}_{uuid.uuid4().hex}.{ext}"
+    # Retornar la ruta completa
+    return f"profiles/{instance.usuario.id}/{filename}"
 
 class ConfiguracionUsuario(models.Model):
     """
@@ -15,6 +29,15 @@ class ConfiguracionUsuario(models.Model):
         primary_key=True,
         related_name='configuracion',
         verbose_name="Usuario"
+    )
+    
+    # Foto de perfil
+    foto_perfil = models.ImageField(
+        upload_to=profile_photo_upload_path,
+        blank=True,
+        null=True,
+        verbose_name="Foto de Perfil",
+        help_text="Foto de perfil del usuario (formatos admitidos: JPG, PNG, GIF)"
     )
     
     # Configuraciones de notificaciones
@@ -88,3 +111,13 @@ class ConfiguracionUsuario(models.Model):
         else:
             self.latitud_preferida = None
             self.longitud_preferida = None
+
+    def get_profile_photo_url(self):
+        """Retorna la URL de la foto de perfil o None si no tiene"""
+        if self.foto_perfil:
+            return self.foto_perfil.url
+        return None
+    
+    def has_profile_photo(self):
+        """Verifica si el usuario tiene foto de perfil"""
+        return bool(self.foto_perfil)

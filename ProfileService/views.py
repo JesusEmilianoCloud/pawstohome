@@ -2,6 +2,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core.files.storage import default_storage
+from django.conf import settings
+import os
 from .models import ConfiguracionUsuario
 
 # Create your views here.
@@ -47,6 +50,49 @@ def edit_profile_view(request):
     
     if request.method == 'POST':
         try:
+            # Manejar subida de foto de perfil
+            if 'foto_perfil' in request.FILES:
+                nueva_foto = request.FILES['foto_perfil']
+                
+                # Validar tipo de archivo
+                allowed_types = ['image/jpeg', 'image/png', 'image/gif']
+                if nueva_foto.content_type not in allowed_types:
+                    messages.error(request, "Tipo de archivo no válido. Solo se permiten JPG, PNG y GIF.")
+                    return render(request, 'edit_profile.html', {
+                        'user': user,
+                        'configuracion': configuracion
+                    })
+                
+                # Validar tamaño (máximo 5MB)
+                if nueva_foto.size > 5 * 1024 * 1024:
+                    messages.error(request, "El archivo es muy grande. Máximo 5MB permitidos.")
+                    return render(request, 'edit_profile.html', {
+                        'user': user,
+                        'configuracion': configuracion
+                    })
+                
+                # Eliminar foto anterior si existe
+                if configuracion.foto_perfil:
+                    try:
+                        # Solo eliminar si estamos usando storage personalizado
+                        if hasattr(configuracion.foto_perfil, 'delete'):
+                            configuracion.foto_perfil.delete(save=False)
+                    except Exception as e:
+                        # Log el error pero continúa
+                        print(f"Error eliminando foto anterior: {e}")
+                
+                # Asignar nueva foto
+                configuracion.foto_perfil = nueva_foto
+            
+            # Manejar eliminación de foto
+            elif 'eliminar_foto' in request.POST:
+                if configuracion.foto_perfil:
+                    try:
+                        configuracion.foto_perfil.delete(save=False)
+                        configuracion.foto_perfil = None
+                    except Exception as e:
+                        print(f"Error eliminando foto: {e}")
+            
             # Actualizar información personal del usuario
             user.first_name = request.POST.get('first_name', user.first_name)
             user.last_name = request.POST.get('last_name', user.last_name)
