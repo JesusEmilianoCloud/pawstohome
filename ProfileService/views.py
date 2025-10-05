@@ -74,24 +74,14 @@ def edit_profile_view(request):
                         'configuracion': configuracion
                     })
                 
-                # Eliminar foto anterior si existe
-                if configuracion.foto_perfil:
-                    try:
-                        # Solo eliminar si estamos usando storage personalizado
-                        if hasattr(configuracion.foto_perfil, 'delete'):
-                            configuracion.foto_perfil.delete(save=False)
-                    except Exception as e:
-                        # Log el error pero continúa
-                        print(f"Error eliminando foto anterior: {e}")
-                
-                # Asignar nueva foto
+                # Asignar nueva foto (las señales se encargarán de eliminar la anterior de R2)
                 configuracion.foto_perfil = nueva_foto
             
             # Manejar eliminación de foto
             elif 'eliminar_foto' in request.POST:
                 if configuracion.foto_perfil:
                     try:
-                        configuracion.foto_perfil.delete(save=False)
+                        # Eliminar foto (las señales se encargarán de R2)
                         configuracion.foto_perfil = None
                     except Exception as e:
                         print(f"Error eliminando foto: {e}")

@@ -1,6 +1,9 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch import receiver
 from django.conf import settings
+import boto3
+from botocore.exceptions import ClientError
+import logging
 from .models import ConfiguracionUsuario
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
@@ -22,3 +25,84 @@ def guardar_configuracion_usuario(sender, instance, **kwargs):
         instance.configuracion.save()
     else:
         ConfiguracionUsuario.objects.create(usuario=instance)
+
+# Configurar logger
+logger = logging.getLogger(__name__)
+
+def eliminar_imagen_perfil_de_cloudflare_r2(imagen_path):
+    """
+    Función para eliminar una imagen de perfil específica de Cloudflare R2
+    """
+    try:
+        # Configurar cliente S3 para Cloudflare R2
+        s3_client = boto3.client(
+            's3',
+            endpoint_url=settings.CLOUDFLARE_R2_ENDPOINT_URL,
+            aws_access_key_id=settings.CLOUDFLARE_R2_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
+            region_name='auto'
+        )
+        
+        # Limpiar el path de la imagen (remover 'media/' si está presente)
+        if imagen_path.startswith('media/'):
+            imagen_path = imagen_path[6:]
+            
+        # Agregar el prefijo media/ para R2
+        r2_key = f"media/{imagen_path}"
+        
+        # Eliminar el archivo del bucket
+        response = s3_client.delete_object(
+            Bucket=settings.CLOUDFLARE_R2_BUCKET_NAME,
+            Key=r2_key
+        )
+        
+        logger.info(f"Foto de perfil eliminada exitosamente de R2: {r2_key}")
+        
+    except ClientError as e:
+        logger.error(f"Error al eliminar foto de perfil de R2: {str(e)}")
+    except Exception as e:
+        logger.error(f"Error inesperado al eliminar foto de perfil de R2: {str(e)}")
+
+@receiver(pre_save, sender=ConfiguracionUsuario)
+def eliminar_foto_perfil_anterior_r2(sender, instance, **kwargs):
+    """
+    Signal para eliminar la foto de perfil anterior de R2 cuando se actualiza
+    """
+    if instance.pk:  # Solo si es una actualización
+        try:
+            # Obtener la instancia actual de la base de datos
+            configuracion_actual = ConfiguracionUsuario.objects.get(pk=instance.pk)
+            
+            # Si hay una foto anterior y se está cambiando
+            if (configuracion_actual.foto_perfil and 
+                configuracion_actual.foto_perfil != instance.foto_perfil and
+                configuracion_actual.foto_perfil.name):
+                
+                # Eliminar la foto anterior de R2
+                eliminar_imagen_perfil_de_cloudflare_r2(configuracion_actual.foto_perfil.name)
+                
+        except ConfiguracionUsuario.DoesNotExist:
+            pass
+        except Exception as e:
+            logger.error(f"Error en signal pre_save para ConfiguracionUsuario {instance.pk}: {str(e)}")
+
+@receiver(pre_delete, sender=ConfiguracionUsuario)
+def eliminar_foto_perfil_al_borrar_configuracion(sender, instance, **kwargs):
+    """
+    Signal para eliminar la foto de perfil de R2 cuando se elimina la configuración
+    """
+    if instance.foto_perfil and instance.foto_perfil.name:
+        eliminar_imagen_perfil_de_cloudflare_r2(instance.foto_perfil.name)
+
+@receiver(pre_delete, sender=settings.AUTH_USER_MODEL)
+def eliminar_foto_perfil_al_borrar_usuario(sender, instance, **kwargs):
+    """
+    Signal para eliminar la foto de perfil de R2 cuando se elimina el usuario
+    """
+    try:
+        if hasattr(instance, 'configuracion') and instance.configuracion.foto_perfil:
+            eliminar_imagen_perfil_de_cloudflare_r2(instance.configuracion.foto_perfil.name)
+    except ConfiguracionUsuario.DoesNotExist:
+        pass
+    except Exception as e:
+        logger.error(f"Error al eliminar foto de perfil para usuario {instance.id}: {str(e)}")
