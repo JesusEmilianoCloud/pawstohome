@@ -2,6 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.core.files.storage import default_storage
+from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+import os
 from .models import ConfiguracionUsuario
 
 # Create your views here.
@@ -47,6 +53,49 @@ def edit_profile_view(request):
     
     if request.method == 'POST':
         try:
+            # Manejar subida de foto de perfil
+            if 'foto_perfil' in request.FILES:
+                nueva_foto = request.FILES['foto_perfil']
+                
+                # Validar tipo de archivo
+                allowed_types = ['image/jpeg', 'image/png', 'image/gif']
+                if nueva_foto.content_type not in allowed_types:
+                    messages.error(request, "Tipo de archivo no válido. Solo se permiten JPG, PNG y GIF.")
+                    return render(request, 'edit_profile.html', {
+                        'user': user,
+                        'configuracion': configuracion
+                    })
+                
+                # Validar tamaño (máximo 5MB)
+                if nueva_foto.size > 5 * 1024 * 1024:
+                    messages.error(request, "El archivo es muy grande. Máximo 5MB permitidos.")
+                    return render(request, 'edit_profile.html', {
+                        'user': user,
+                        'configuracion': configuracion
+                    })
+                
+                # Eliminar foto anterior si existe
+                if configuracion.foto_perfil:
+                    try:
+                        # Solo eliminar si estamos usando storage personalizado
+                        if hasattr(configuracion.foto_perfil, 'delete'):
+                            configuracion.foto_perfil.delete(save=False)
+                    except Exception as e:
+                        # Log el error pero continúa
+                        print(f"Error eliminando foto anterior: {e}")
+                
+                # Asignar nueva foto
+                configuracion.foto_perfil = nueva_foto
+            
+            # Manejar eliminación de foto
+            elif 'eliminar_foto' in request.POST:
+                if configuracion.foto_perfil:
+                    try:
+                        configuracion.foto_perfil.delete(save=False)
+                        configuracion.foto_perfil = None
+                    except Exception as e:
+                        print(f"Error eliminando foto: {e}")
+            
             # Actualizar información personal del usuario
             user.first_name = request.POST.get('first_name', user.first_name)
             user.last_name = request.POST.get('last_name', user.last_name)
@@ -67,22 +116,40 @@ def edit_profile_view(request):
             if radio:
                 configuracion.radio_notificaciones = float(radio)
             
-            # Actualizar ubicación preferida
-            latitud = request.POST.get('latitud_preferida')
-            longitud = request.POST.get('longitud_preferida')
+            # Actualizar dirección
+            nueva_direccion = request.POST.get('direccion', '').strip()
+            direccion_cambio = configuracion.direccion != nueva_direccion
             
-            if latitud and longitud:
-                try:
-                    configuracion.set_ubicacion_preferida(float(latitud), float(longitud))
-                except ValueError as e:
-                    messages.error(request, f"Error en las coordenadas: {str(e)}")
-                    return render(request, 'edit_profile.html', {
-                        'user': user,
-                        'configuracion': configuracion
-                    })
+            if nueva_direccion:
+                configuracion.direccion = nueva_direccion
+                
+                # Si hay geocoding automático habilitado, intentar obtener coordenadas
+                geocoding_auto = 'geocoding_automatico' in request.POST
+                if geocoding_auto and direccion_cambio:
+                    if configuracion.actualizar_coordenadas_desde_direccion():
+                        messages.success(request, "Dirección actualizada y coordenadas obtenidas automáticamente.")
+                    else:
+                        messages.warning(request, "Dirección actualizada, pero no se pudieron obtener las coordenadas automáticamente.")
             else:
-                configuracion.latitud_preferida = None
-                configuracion.longitud_preferida = None
+                configuracion.direccion = None
+            
+            # Actualizar ubicación preferida manualmente (solo si no se hizo geocoding automático)
+            if 'geocoding_automatico' not in request.POST:
+                latitud = request.POST.get('latitud_preferida')
+                longitud = request.POST.get('longitud_preferida')
+                
+                if latitud and longitud:
+                    try:
+                        configuracion.set_ubicacion_preferida(float(latitud), float(longitud))
+                    except ValueError as e:
+                        messages.error(request, f"Error en las coordenadas: {str(e)}")
+                        return render(request, 'edit_profile.html', {
+                            'user': user,
+                            'configuracion': configuracion
+                        })
+                else:
+                    configuracion.latitud_preferida = None
+                    configuracion.longitud_preferida = None
             
             # Actualizar tipos de reportes
             configuracion.notificar_perdidos = 'notificar_perdidos' in request.POST
@@ -102,3 +169,49 @@ def edit_profile_view(request):
     }
     
     return render(request, 'edit_profile.html', context)
+
+@login_required
+def geocodificar_direccion_ajax(request):
+    """
+    Vista AJAX para geocodificar una dirección en tiempo real
+    """
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            direccion = data.get('direccion', '').strip()
+            
+            if not direccion:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Dirección vacía'
+                })
+            
+            # Crear objeto temporal para usar el método de geocodificación
+            configuracion_temp = ConfiguracionUsuario()
+            configuracion_temp.direccion = direccion
+            
+            resultado = configuracion_temp.geocodificar_direccion()
+            
+            if resultado:
+                return JsonResponse({
+                    'success': True,
+                    'latitud': resultado['latitud'],
+                    'longitud': resultado['longitud'],
+                    'display_name': resultado['display_name']
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'No se pudo geocodificar la dirección'
+                })
+                
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': f'Error del servidor: {str(e)}'
+            })
+    
+    return JsonResponse({
+        'success': False,
+        'error': 'Método no permitido'
+    })

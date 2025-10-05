@@ -40,6 +40,40 @@
         </div>
     </main>
 
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <!-- Logo y descripción principal -->
+                <div class="footer-main">
+                    <div class="footer-logo">
+                        <div class="header-logo"><img src="{% static 'images/Logo.png' %}" alt="PawsToHome Logo"></div>
+                        <div class="footer-logo-text">
+                            <h3>¿Perdiste a tu mascota?</h3>
+                            <p>No esperes más. Mientras más rápido reportes, mayores son las posibilidades de encontrarla.</p>
+                        </div>
+                    </div>
+                    <a href="{% url 'reportsservice:crear_reporte' %}" class="footer-cta-btn">Reportar perro perdido</a>
+                </div>
+
+                <!-- Enlaces de navegación -->
+                <div class="footer-links">
+                    <div class="footer-links-group">
+                        <a href="#" class="footer-link">Privacidad</a>
+                        <a href="#" class="footer-link">Contacto</a>
+                        <a href="#" class="footer-link">Términos</a>
+                        <a href="#" class="footer-link">Centro de ayuda</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Copyright -->
+            <div class="footer-bottom">
+                <p>&copy; 2028 PawsToHome. Todos los derechos reservados</p>
+            </div>
+        </div>
+    </footer>
+
     <script src="{% static 'js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
