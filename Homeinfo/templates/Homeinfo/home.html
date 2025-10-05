@@ -115,15 +115,19 @@
                             {% if reporte.tipo_reporte == 'perdido' %}Perdido{% else %}Encontrado{% endif %}
                         </div>
                         {% if reporte.fotos.first %}
-                            <img src="{{ reporte.fotos.first.imagen.url }}" alt="{{ reporte.nombre_perro }}" 
-                                 style="width: 100%; height: 100%; object-fit: cover;" 
-                                 onerror="console.log('Error cargando imagen:', this.src); this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                            <div style="display: none; width: 100%; height: 100%; justify-content: center; align-items: center; background: #f8f9fa;">
-                                <span style="font-size: 80px;">🐕</span>
-                            </div>
+                            {% with foto=reporte.fotos.first %}
+                                <img src="{{ foto.imagen.url }}" 
+                                     alt="{{ reporte.nombre_perro }}" 
+                                     class="pet-main-image"
+                                     loading="lazy"
+                                     onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="pet-image-fallback" style="display: none;">
+                                    <span style="font-size: 80px; color: #9CA3AF;">🐕</span>
+                                </div>
+                            {% endwith %}
                         {% else %}
                             <!-- Imagen por defecto cuando no hay fotos -->
-                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                            <div class="pet-image-placeholder">
                                 <span style="font-size: 80px; color: white;">🐕</span>
                             </div>
                         {% endif %}
