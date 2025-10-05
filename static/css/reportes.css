@@ -234,7 +234,6 @@
     display: flex;
     padding: 2rem;
     gap: 1.5rem;
-    align-items: flex-start;
 }
 
 .action-card:hover {
@@ -264,6 +263,22 @@
     flex-shrink: 0;
     background: #f8f9fa;
     color: var(--orange-light);
+}
+
+/* Iconos con colores específicos para cada tarjeta */
+.card-red .action-icon-container {
+    background: #FFF5F5;
+    color: var(--red);
+}
+
+.card-green .action-icon-container {
+    background: #F0FFF4;
+    color: var(--green);
+}
+
+.card-blue .action-icon-container {
+    background: #EBF8FF;
+    color: var(--blue);
 }
 
 .action-content {
@@ -300,6 +315,8 @@
     border: none;
     cursor: pointer;
     width: fit-content;
+    margin-top: auto;
+    align-self: flex-start;
 }
 
 .action-btn:hover {
@@ -390,6 +407,28 @@
     overflow: hidden;
 }
 
+.report-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.report-card:hover .report-image img {
+    transform: scale(1.05);
+}
+
+.pet-main-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.report-card:hover .pet-main-image {
+    transform: scale(1.05);
+}
+
 .sample-pet-image {
     font-size: 4rem;
     color: #9CA3AF;
@@ -453,18 +492,17 @@
     line-height: 1.6;
     margin-bottom: 1.5rem;
     font-size: var(--text-sm);
-    flex: 1;
 }
 
 .report-actions {
     display: flex;
     gap: 0.75rem;
-    margin-top: auto;
+    margin-top: 1rem;
 }
 
 .report-btn {
     flex: 1;
-    padding: 10px 16px;
+    padding: 8px 8px;
     border-radius: 8px;
     text-decoration: none;
     text-align: center;
@@ -473,6 +511,7 @@
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
+    margin: -50px 15px 15px 15px;
 }
 
 .report-btn.btn-primary {
