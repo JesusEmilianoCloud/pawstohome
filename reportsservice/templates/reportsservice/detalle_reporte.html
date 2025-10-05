@@ -5,42 +5,58 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/detalle_reporte.css' %}">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+      crossorigin=""/>
 {% endblock %}
 
 {% block content %}
-<div class="report-detail-container">
-    <!-- Breadcrumb -->
-    <nav class="breadcrumb">
-        <a href="{% url 'Homeinfo:home' %}">Inicio</a>
-        <span class="separator">›</span>
-        <a href="{% url 'reportsservice:reportes' %}">Reportes</a>
-        <span class="separator">›</span>
-        <span class="current">{{ reporte.nombre_perro }}</span>
-    </nav>
-
-    <!-- Header del reporte -->
-    <div class="report-header">
-        <div class="report-status">
-            {% if reporte.tipo_reporte == 'perdido' %}
-                <span class="status-badge lost">🔍 Mascota Perdida</span>
-            {% else %}
-                <span class="status-badge found">🏠 Mascota Encontrada</span>
-            {% endif %}
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-orange">
+    <div class="hero-container">
+        <div class="hero-content">
+            <!-- Breadcrumb -->
+            <nav class="breadcrumb">
+                <a href="{% url 'Homeinfo:home' %}">Inicio</a>
+                <span class="separator">›</span>
+                <a href="{% url 'reportsservice:reportes' %}">Reportes</a>
+                <span class="separator">›</span>
+                <span class="current">{{ reporte.nombre_perro }}</span>
+            </nav>
             
-            <span class="state-badge {{ reporte.estado }}">{{ reporte.get_estado_display }}</span>
+            <h1>{{ reporte.nombre_perro }}</h1>
+            <p>{{ reporte.get_tipo_reporte_display }} en {{ reporte.zona }}</p>
         </div>
-        
-        <h1 class="report-title">{{ reporte.nombre_perro }}</h1>
-        <p class="report-subtitle">{{ reporte.get_tipo_reporte_display }} en {{ reporte.zona }}</p>
     </div>
+    
+    <!-- Animación de onda -->
+    <div class="wave-animation">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,60L40,65C80,70,160,80,240,75C320,70,400,50,480,45C560,40,640,50,720,65C800,80,880,100,960,100C1040,100,1120,80,1160,70L1200,60V120H1160C1120,120,1040,120,960,120C880,120,800,120,720,120C640,120,560,120,480,120C400,120,320,120,240,120C160,120,80,120,40,120H0V60Z" class="wave-path wave-1"></path>
+            <path d="M0,80L40,75C80,70,160,60,240,65C320,70,400,90,480,95C560,100,640,90,720,75C800,60,880,40,960,40C1040,40,1120,60,1160,70L1200,80V120H1160C1120,120,1040,120,960,120C880,120,800,120,720,120C640,120,560,120,480,120C400,120,320,120,240,120C160,120,80,120,40,120H0V80Z" class="wave-path wave-2"></path>
+            <path d="M0,40L40,50C80,60,160,80,240,85C320,90,400,80,480,70C560,60,640,50,720,55C800,60,880,80,960,85C1040,90,1120,80,1160,75L1200,70V120H1160C1120,120,1040,120,960,120C880,120,800,120,720,120C640,120,560,120,480,120C400,120,320,120,240,120C160,120,80,120,40,120H0V40Z" class="wave-path wave-3"></path>
+        </svg>
+    </div>
+</section>
 
-    <div class="report-content">
-        <div class="main-content">
-            <!-- Galería de fotos -->
+<div class="report-detail-container">
+
+    <!-- Sección de Galería de Fotos -->
+    <section class="photo-gallery-section">
+        <div class="section-container">
             {% if reporte.fotos.exists %}
             <div class="photo-gallery">
                 <div class="main-photo">
                     <img src="{{ reporte.fotos.first.imagen.url }}" alt="{{ reporte.nombre_perro }}" id="main-image">
+                    
+                    <!-- Status badges superpuestos en la imagen -->
+                    <div class="image-status-badges">
+                        {% if reporte.tipo_reporte == 'perdido' %}
+                            <span class="status-badge lost">Mascota Perdida</span>
+                        {% else %}
+                            <span class="status-badge found">Mascota Encontrada</span>
+                        {% endif %}
+                    </div>
                 </div>
                 
                 {% if reporte.fotos.count > 1 %}
@@ -60,229 +76,258 @@
                 <p>No hay fotos disponibles para este reporte</p>
             </div>
             {% endif %}
+        </div>
+    </section>
 
-            <!-- Información de la mascota -->
-            <div class="pet-info-section">
-                <h2 class="section-title">
-                    <span class="section-icon">🐾</span>
-                    Información de la Mascota
-                </h2>
+    <!-- Sección de Información de la Mascota -->
+    <section class="pet-info-section">
+        <div class="section-container">
+            <h2 class="section-title">
+                <span class="section-icon">🐾</span>
+                Información de la Mascota
+            </h2>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-icon">🐕</div>
+                    <div class="info-content">
+                        <h4>Nombre</h4>
+                        <p>{{ reporte.nombre_perro }}</p>
+                    </div>
+                </div>
                 
-                <div class="info-grid">
-                    <div class="info-card">
-                        <div class="info-icon">🐕</div>
-                        <div class="info-content">
-                            <h4>Nombre</h4>
-                            <p>{{ reporte.nombre_perro }}</p>
-                        </div>
+                <div class="info-card">
+                    <div class="info-icon">🏷️</div>
+                    <div class="info-content">
+                        <h4>Raza</h4>
+                        <p>{{ reporte.raza.nombre|default:"No especificada" }}</p>
                     </div>
-                    
-                    <div class="info-card">
-                        <div class="info-icon">🏷️</div>
-                        <div class="info-content">
-                            <h4>Raza</h4>
-                            <p>{{ reporte.raza.nombre|default:"No especificada" }}</p>
-                        </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">📏</div>
+                    <div class="info-content">
+                        <h4>Tamaño</h4>
+                        <p>{{ reporte.get_tamano_display }}</p>
                     </div>
-                    
-                    <div class="info-card">
-                        <div class="info-icon">📏</div>
-                        <div class="info-content">
-                            <h4>Tamaño</h4>
-                            <p>{{ reporte.get_tamano_display }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="info-card">
-                        <div class="info-icon">🎨</div>
-                        <div class="info-content">
-                            <h4>Color</h4>
-                            <p>{{ reporte.color }}</p>
-                        </div>
+                </div>
+                
+                <div class="info-card">
+                    <div class="info-icon">🎨</div>
+                    <div class="info-content">
+                        <h4>Color</h4>
+                        <p>{{ reporte.color }}</p>
                     </div>
                 </div>
             </div>
+        </div>
+    </section>
 
-            <!-- Descripción -->
-            <div class="description-section">
-                <h2 class="section-title">
-                    <span class="section-icon">📝</span>
-                    Descripción
-                </h2>
-                <div class="description-content">
-                    <p>{{ reporte.descripcion|linebreaks }}</p>
-                    
-                    {% if reporte.caracteristicas_distintivas %}
-                    <div class="distinctive-features">
-                        <h4>Características Distintivas:</h4>
-                        <p>{{ reporte.caracteristicas_distintivas|linebreaks }}</p>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Comentarios -->
-            <div class="comments-section">
-                <h2 class="section-title">
-                    <span class="section-icon">💬</span>
-                    Comentarios ({{ reporte.comentarios.count }})
-                </h2>
+    <!-- Sección de Descripción -->
+    <section class="description-section">
+        <div class="section-container">
+            <h2 class="section-title">
+                <span class="section-icon">📝</span>
+                Descripción
+            </h2>
+            <div class="description-content">
+                <p>{{ reporte.descripcion|linebreaks }}</p>
                 
-                {% if user.is_authenticated %}
-                <form method="post" action="{% url 'reportsservice:agregar_comentario' reporte.id %}" class="comment-form">
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <label for="tipo">Tipo de comentario</label>
-                        <select name="tipo" id="tipo" class="form-control">
-                            <option value="informacion">Información</option>
-                            <option value="avistamiento">Avistamiento</option>
-                            <option value="pregunta">Pregunta</option>
-                            <option value="actualizacion">Actualización</option>
-                            <option value="otro">Otro</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="contenido">Comentario</label>
-                        <textarea name="contenido" id="contenido" class="form-control" 
-                                  placeholder="Escribe tu comentario..." required></textarea>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-primary">Agregar Comentario</button>
-                </form>
+                {% if reporte.caracteristicas_distintivas %}
+                <div class="distinctive-features">
+                    <h4>Características Distintivas:</h4>
+                    <p>{{ reporte.caracteristicas_distintivas|linebreaks }}</p>
+                </div>
                 {% endif %}
-                
-                <div class="comments-list">
-                    {% for comentario in reporte.comentarios.all %}
-                    <div class="comment-item">
-                        <div class="comment-header">
-                            <div class="comment-author">
-                                <div class="author-avatar">
-                                    {{ comentario.usuario.first_name|first|upper }}{{ comentario.usuario.last_name|first|upper }}
+            </div>
+        </div>
+    </section>
+
+    <!-- Layout principal con contenido y sidebar -->
+    <div class="report-detail-layout">
+        <div class="section-container">
+            <div class="report-content">
+                <div class="main-content">
+                    <!-- Sección de Comentarios -->
+                    <section class="comments-section">
+                        <h2 class="section-title">
+                            <span class="section-icon">💬</span>
+                            Comentarios ({{ reporte.comentarios.count }})
+                        </h2>
+                        
+                        {% if user.is_authenticated %}
+                        <form method="post" action="{% url 'reportsservice:agregar_comentario' reporte.id %}" class="comment-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="tipo">Tipo de comentario</label>
+                                <select name="tipo" id="tipo" class="form-control">
+                                    <option value="informacion">Información</option>
+                                    <option value="avistamiento">Avistamiento</option>
+                                    <option value="pregunta">Pregunta</option>
+                                    <option value="actualizacion">Actualización</option>
+                                    <option value="otro">Otro</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="contenido">Comentario</label>
+                                <textarea name="contenido" id="contenido" class="form-control" 
+                                          placeholder="Escribe tu comentario..." required maxlength="500"></textarea>
+                                <div class="char-counter">500 caracteres restantes</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <span>💬</span>
+                                Agregar Comentario
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        <div class="comments-list">
+                            {% for comentario in reporte.comentarios.all %}
+                            <div class="comment-item">
+                                <div class="comment-header">
+                                    <div class="comment-author">
+                                        <div class="author-avatar">
+                                            {{ comentario.usuario.first_name|first|upper }}{{ comentario.usuario.last_name|first|upper }}
+                                        </div>
+                                        <div class="author-info">
+                                            <span class="author-name">{{ comentario.usuario.first_name }} {{ comentario.usuario.last_name }}</span>
+                                            <span class="comment-time">{{ comentario.fecha_comentario|timesince }} atrás</span>
+                                        </div>
+                                    </div>
+                                    <span class="comment-type {{ comentario.tipo }}">{{ comentario.get_tipo_display }}</span>
                                 </div>
-                                <div class="author-info">
-                                    <span class="author-name">{{ comentario.usuario.first_name }} {{ comentario.usuario.last_name }}</span>
-                                    <span class="comment-time">{{ comentario.fecha_comentario|timesince }} atrás</span>
+                                
+                                <div class="comment-content">
+                                    <p>{{ comentario.contenido|linebreaks }}</p>
+                                    
+                                    {% if comentario.tiene_ubicacion %}
+                                    <div class="comment-location">
+                                        <span class="location-icon">📍</span>
+                                        <span>Ubicación: {{ comentario.latitud|floatformat:4 }}, {{ comentario.longitud|floatformat:4 }}</span>
+                                    </div>
+                                    {% endif %}
                                 </div>
                             </div>
-                            <span class="comment-type {{ comentario.tipo }}">{{ comentario.get_tipo_display }}</span>
+                            {% empty %}
+                            <div class="no-comments">
+                                <div class="no-comments-icon">💭</div>
+                                <h3>No hay comentarios aún</h3>
+                                <p>¡Sé el primero en comentar y ayudar con este caso!</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Sidebar con información adicional -->
+                <div class="sidebar">
+                    <!-- Información de ubicación -->
+                    <div class="sidebar-card">
+                        <h3 class="card-title">
+                            <span class="card-icon">📍</span>
+                            Ubicación
+                        </h3>
+                        
+                        <div class="location-info">
+                            <p><strong>Dirección:</strong> {{ reporte.direccion }}</p>
+                            <p><strong>Zona:</strong> {{ reporte.zona }}</p>
+                            <p><strong>Coordenadas:</strong> {{ reporte.latitud|floatformat:4 }}, {{ reporte.longitud|floatformat:4 }}</p>
                         </div>
                         
-                        <div class="comment-content">
-                            <p>{{ comentario.contenido|linebreaks }}</p>
+                        <div class="map-container">
+                            <div id="sidebar-map" 
+                                 data-lat="{{ reporte.latitud }}" 
+                                 data-lng="{{ reporte.longitud }}"
+                                 data-direccion="{{ reporte.direccion }}"
+                                 data-zona="{{ reporte.zona }}"
+                                 data-nombre="{{ reporte.nombre_perro }}">
+                            </div>
+                            <div class="map-overlay">
+                                <button class="map-button" onclick="openFullMap()">
+                                    <span class="map-icon">🗺️</span>
+                                    <span>Ver en mapa completo</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Información de fechas -->
+                    <div class="sidebar-card">
+                        <h3 class="card-title">
+                            <span class="card-icon">📅</span>
+                            Fechas Importantes
+                        </h3>
+                        
+                        <div class="dates-info">
+                            <div class="date-item">
+                                <span class="date-label">Fecha del incidente:</span>
+                                <span class="date-value">{{ reporte.fecha_incidente|date:"d M Y, H:i" }}</span>
+                            </div>
                             
-                            {% if comentario.tiene_ubicacion %}
-                            <div class="comment-location">
-                                <span class="location-icon">📍</span>
-                                <span>Ubicación: {{ comentario.latitud|floatformat:4 }}, {{ comentario.longitud|floatformat:4 }}</span>
+                            <div class="date-item">
+                                <span class="date-label">Reportado:</span>
+                                <span class="date-value">{{ reporte.fecha_reporte|date:"d M Y, H:i" }}</span>
+                            </div>
+                            
+                            {% if reporte.fecha_cierre %}
+                            <div class="date-item">
+                                <span class="date-label">Cerrado:</span>
+                                <span class="date-value">{{ reporte.fecha_cierre|date:"d M Y, H:i" }}</span>
                             </div>
                             {% endif %}
                         </div>
                     </div>
-                    {% empty %}
-                    <div class="no-comments">
-                        <p>No hay comentarios aún. ¡Sé el primero en comentar!</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
 
-        <!-- Sidebar con información adicional -->
-        <div class="sidebar">
-            <!-- Información de ubicación -->
-            <div class="sidebar-card">
-                <h3 class="card-title">
-                    <span class="card-icon">📍</span>
-                    Ubicación
-                </h3>
-                
-                <div class="location-info">
-                    <p><strong>Dirección:</strong> {{ reporte.direccion }}</p>
-                    <p><strong>Zona:</strong> {{ reporte.zona }}</p>
-                    <p><strong>Coordenadas:</strong> {{ reporte.latitud|floatformat:4 }}, {{ reporte.longitud|floatformat:4 }}</p>
-                </div>
-                
-                <div class="map-placeholder">
-                    <div class="map-icon">🗺️</div>
-                    <p>Mapa de ubicación</p>
-                    <small>Lat: {{ reporte.latitud|floatformat:4 }}, Lon: {{ reporte.longitud|floatformat:4 }}</small>
-                </div>
-            </div>
+                    <!-- Información de contacto -->
+                    <div class="sidebar-card">
+                        <h3 class="card-title">
+                            <span class="card-icon">📞</span>
+                            Contacto
+                        </h3>
+                        
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <span class="contact-icon">📱</span>
+                                <a href="tel:{{ reporte.telefono_contacto }}">{{ reporte.telefono_contacto }}</a>
+                            </div>
+                            
+                            <div class="contact-item">
+                                <span class="contact-icon">📧</span>
+                                <a href="mailto:{{ reporte.email_contacto }}">{{ reporte.email_contacto }}</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-buttons">
+                            <a href="tel:{{ reporte.telefono_contacto }}" class="btn btn-primary btn-block">
+                                <span>📞</span>
+                                Llamar
+                            </a>
+                            <a href="mailto:{{ reporte.email_contacto }}" class="btn btn-outline btn-block">
+                                <span>📧</span>
+                                Enviar Email
+                            </a>
+                        </div>
+                    </div>
 
-            <!-- Información de fechas -->
-            <div class="sidebar-card">
-                <h3 class="card-title">
-                    <span class="card-icon">📅</span>
-                    Fechas Importantes
-                </h3>
-                
-                <div class="dates-info">
-                    <div class="date-item">
-                        <span class="date-label">Fecha del incidente:</span>
-                        <span class="date-value">{{ reporte.fecha_incidente|date:"d M Y, H:i" }}</span>
-                    </div>
-                    
-                    <div class="date-item">
-                        <span class="date-label">Reportado:</span>
-                        <span class="date-value">{{ reporte.fecha_reporte|date:"d M Y, H:i" }}</span>
-                    </div>
-                    
-                    {% if reporte.fecha_cierre %}
-                    <div class="date-item">
-                        <span class="date-label">Cerrado:</span>
-                        <span class="date-value">{{ reporte.fecha_cierre|date:"d M Y, H:i" }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Información de contacto -->
-            <div class="sidebar-card">
-                <h3 class="card-title">
-                    <span class="card-icon">📞</span>
-                    Contacto
-                </h3>
-                
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <span class="contact-icon">📱</span>
-                        <a href="tel:{{ reporte.telefono_contacto }}">{{ reporte.telefono_contacto }}</a>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <span class="contact-icon">📧</span>
-                        <a href="mailto:{{ reporte.email_contacto }}">{{ reporte.email_contacto }}</a>
-                    </div>
-                </div>
-                
-                <div class="contact-buttons">
-                    <a href="tel:{{ reporte.telefono_contacto }}" class="btn btn-primary btn-block">
-                        <span>📞</span>
-                        Llamar
-                    </a>
-                    <a href="mailto:{{ reporte.email_contacto }}" class="btn btn-outline btn-block">
-                        <span>📧</span>
-                        Enviar Email
-                    </a>
-                </div>
-            </div>
-
-            <!-- Reportado por -->
-            <div class="sidebar-card">
-                <h3 class="card-title">
-                    <span class="card-icon">👤</span>
-                    Reportado por
-                </h3>
-                
-                <div class="reporter-info">
-                    <div class="reporter-avatar">
-                        {{ reporte.usuario.first_name|first|upper }}{{ reporte.usuario.last_name|first|upper }}
-                    </div>
-                    <div class="reporter-details">
-                        <p class="reporter-name">{{ reporte.usuario.first_name }} {{ reporte.usuario.last_name }}</p>
-                        <p class="reporter-username">@{{ reporte.usuario.username }}</p>
-                        <p class="reporter-date">Miembro desde {{ reporte.usuario.date_joined|date:"M Y" }}</p>
+                    <!-- Reportado por -->
+                    <div class="sidebar-card">
+                        <h3 class="card-title">
+                            <span class="card-icon">👤</span>
+                            Reportado por
+                        </h3>
+                        
+                        <div class="reporter-info">
+                            <div class="reporter-avatar">
+                                {{ reporte.usuario.first_name|first|upper }}{{ reporte.usuario.last_name|first|upper }}
+                            </div>
+                            <div class="reporter-details">
+                                <p class="reporter-name">{{ reporte.usuario.first_name }} {{ reporte.usuario.last_name }}</p>
+                                <p class="reporter-username">@{{ reporte.usuario.username }}</p>
+                                <p class="reporter-date">Miembro desde {{ reporte.usuario.date_joined|date:"M Y" }}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -292,5 +337,233 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/detalle_reporte.js' %}"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+        crossorigin=""></script>
+<script>
+// Detalle Reporte JavaScript - Refactorizado
+document.addEventListener('DOMContentLoaded', function() {
+    initializeReportDetail();
+});
+
+function initializeReportDetail() {
+    // Inicializar galería de fotos
+    initPhotoGallery();
+    
+    // Inicializar formulario de comentarios
+    initCommentForm();
+    
+    // Inicializar mapa del sidebar
+    initSidebarMap();
+}
+
+// Galería de fotos
+function initPhotoGallery() {
+    const mainImage = document.getElementById('main-image');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    
+    if (mainImage && thumbnails.length > 0) {
+        // Función para cambiar imagen principal
+        window.changeMainImage = function(imageSrc, thumbnailElement) {
+            mainImage.style.opacity = '0.7';
+            
+            setTimeout(() => {
+                mainImage.src = imageSrc;
+                mainImage.style.opacity = '1';
+                
+                // Actualizar thumbnails activos
+                thumbnails.forEach(thumb => thumb.classList.remove('active'));
+                thumbnailElement.classList.add('active');
+            }, 200);
+        };
+        
+        // Navegación con teclado
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                const currentActive = document.querySelector('.thumbnail.active');
+                const currentIndex = Array.from(thumbnails).indexOf(currentActive);
+                
+                let newIndex;
+                if (e.key === 'ArrowLeft') {
+                    newIndex = currentIndex > 0 ? currentIndex - 1 : thumbnails.length - 1;
+                } else {
+                    newIndex = currentIndex < thumbnails.length - 1 ? currentIndex + 1 : 0;
+                }
+                
+                const newThumbnail = thumbnails[newIndex];
+                const newImageSrc = newThumbnail.querySelector('img').src;
+                changeMainImage(newImageSrc, newThumbnail);
+            }
+        });
+        
+        // Zoom en la imagen principal
+        mainImage.addEventListener('click', function() {
+            openImageModal(this.src);
+        });
+    }
+}
+
+// Modal para imagen en pantalla completa
+function openImageModal(imageSrc) {
+    const modal = document.createElement('div');
+    modal.className = 'image-modal';
+    
+    const img = document.createElement('img');
+    img.src = imageSrc;
+    img.className = 'modal-image';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    closeBtn.className = 'modal-close';
+    
+    closeBtn.addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+    
+    document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape') {
+            modal.remove();
+            document.removeEventListener('keydown', escHandler);
+        }
+    });
+    
+    modal.appendChild(img);
+    modal.appendChild(closeBtn);
+    document.body.appendChild(modal);
+}
+
+// Formulario de comentarios
+function initCommentForm() {
+    const commentForm = document.querySelector('.comment-form form');
+    
+    if (commentForm) {
+        const textarea = commentForm.querySelector('textarea');
+        const counter = commentForm.querySelector('.char-counter');
+        const maxLength = 500;
+        
+        // Auto-resize del textarea y contador de caracteres
+        if (textarea && counter) {
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+                
+                const remaining = maxLength - this.value.length;
+                counter.textContent = `${remaining} caracteres restantes`;
+                
+                if (remaining < 50) {
+                    counter.className = 'char-counter char-warning';
+                } else if (remaining < 100) {
+                    counter.className = 'char-counter char-alert';
+                } else {
+                    counter.className = 'char-counter';
+                }
+            });
+        }
+        
+        // Validación del formulario
+        commentForm.addEventListener('submit', function(e) {
+            const contenido = this.querySelector('#contenido');
+            
+            if (!contenido.value.trim()) {
+                e.preventDefault();
+                alert('Por favor escribe un comentario');
+                contenido.focus();
+                return;
+            }
+        });
+    }
+}
+
+// Inicializar mapa del sidebar
+function initSidebarMap() {
+    const mapElement = document.getElementById('sidebar-map');
+    
+    if (mapElement) {
+        const lat = parseFloat(mapElement.dataset.lat);
+        const lng = parseFloat(mapElement.dataset.lng);
+        const direccion = mapElement.dataset.direccion;
+        const zona = mapElement.dataset.zona;
+        const nombre = mapElement.dataset.nombre;
+        
+        // Crear el mapa
+        const map = L.map('sidebar-map', {
+            center: [lat, lng],
+            zoom: 15,
+            zoomControl: false,
+            scrollWheelZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false,
+            keyboard: false,
+            dragging: false,
+            touchZoom: false
+        });
+        
+        // Agregar capa de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+        
+        // Crear icono personalizado para la mascota
+        const petIcon = L.divIcon({
+            className: 'pet-marker',
+            html: '<div class="pet-marker-inner">🐕</div>',
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
+        });
+        
+        // Agregar marcador
+        const marker = L.marker([lat, lng], { icon: petIcon }).addTo(map);
+        
+        // Popup del marcador
+        const popupContent = `
+            <div class="map-popup">
+                <h4>${nombre}</h4>
+                <p><strong>📍 ${zona}</strong></p>
+                <p>${direccion}</p>
+                <small>Lat: ${lat.toFixed(4)}, Lng: ${lng.toFixed(4)}</small>
+            </div>
+        `;
+        marker.bindPopup(popupContent);
+        
+        // Hacer el mapa clickeable para abrir el mapa completo
+        map.on('click', function() {
+            openFullMap();
+        });
+        
+        // Guardar referencia del mapa para uso posterior
+        window.sidebarMapInstance = map;
+    }
+}
+
+// Función para abrir el mapa completo
+function openFullMap() {
+    const mapElement = document.getElementById('sidebar-map');
+    
+    if (mapElement) {
+        const lat = mapElement.dataset.lat;
+        const lng = mapElement.dataset.lng;
+        const direccion = encodeURIComponent(mapElement.dataset.direccion);
+        const zona = encodeURIComponent(mapElement.dataset.zona);
+        const nombre = encodeURIComponent(mapElement.dataset.nombre);
+        
+        // Construir la URL del mapa con los parámetros
+        const mapUrl = `{% url 'Mapservice:mapa_interactivo' %}?lat=${lat}&lng=${lng}&direccion=${direccion}&zona=${zona}&nombre=${nombre}`;
+        
+        // Navegar en la misma pestaña
+        window.location.href = mapUrl;
+    }
+}
+
+// Manejo de enlaces de contacto
+document.addEventListener('click', function(e) {
+    if (e.target.matches('a[href^="tel:"]')) {
+        const phoneNumber = e.target.textContent;
+        if (!confirm(`¿Deseas llamar a ${phoneNumber}?`)) {
+            e.preventDefault();
+        }
+    }
+});
+</script>
 {% endblock %}
