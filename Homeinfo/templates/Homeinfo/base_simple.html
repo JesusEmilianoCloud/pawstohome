@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PawsToHome{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'css/base_simple.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header>
+        <div class="header-bar bg-gradient-orange">
+            <div class="header-logo">
+                <img src="{% static 'images/Logo.png' %}" alt="PawsToHome Logo">
+                <h5 class="header-title">Paws To Home</h5>
+            </div>
+            <nav class="header-nav">
+                <a href="{% url 'Homeinfo:home' %}">Inicio</a>
+                <a href="{% url 'reportsservice:reportes' %}">Reportes</a>
+                <a href="#">Mapa</a>
+                <a href="#">Educacion</a>
+
+                {% if user.is_authenticated %}
+                    <div class="user-menu">
+                        <a href="{% url 'ProfileService:profile' user.id %}">Cuenta</a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'loginservice:login-register' %}">Iniciar sesión</a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,90 @@
+/* Estilos para el header principal tipo barra horizontal */
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 2rem;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+.header-logo {
+    margin-left: 15%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: #fff;
+}
+.header-logo img {
+    height: 32px;
+    width: auto;
+    margin-right: 6px;
+}
+.header-title {
+    margin: 0;
+    font-size: var(--h5-size);
+    color: #fff;
+}
+.header-nav {
+    display: flex;
+    gap: 32px;
+    margin-right: 15%;
+}
+.header-nav a {
+    color: var(--cream);
+    font-size: var(--text-base);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+.header-nav a:hover {
+    color: var(--cream);
+}
+
+.user-menu {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.user-menu a {
+    color: var(--cream);
+    font-size: var(--text-base);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.user-menu a:hover {
+    color: var(--cream);
+}
+
+.logout-link {
+    padding: 4px 12px;
+    border: 1px solid var(--cream);
+    border-radius: 4px;
+    font-size: 14px !important;
+    transition: all 0.2s;
+}
+
+.logout-link:hover {
+    background-color: var(--cream);
+    color: var(--primary-color) !important;
+}
+
+@media (max-width: 768px) {
+    .header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem;
+    }
+    .header-nav {
+        gap: 16px;
+        margin-top: 8px;
+    }
+    .user-menu {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+}
