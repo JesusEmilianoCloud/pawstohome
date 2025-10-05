@@ -1,0 +1,120 @@
+{% extends 'pawtohome/base.html' %}
+
+{% block title %}Estado de Cloudflare R2{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-cloud"></i> Estado de Cloudflare R2</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Estado de R2 -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card {% if r2_enabled %}border-success{% else %}border-warning{% endif %}">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">
+                                        {% if r2_enabled %}
+                                            <i class="fas fa-check-circle text-success"></i> 
+                                            Cloudflare R2 Habilitado
+                                        {% else %}
+                                            <i class="fas fa-exclamation-triangle text-warning"></i> 
+                                            Cloudflare R2 Deshabilitado
+                                        {% endif %}
+                                    </h5>
+                                    <p class="card-text">
+                                        {% if r2_enabled %}
+                                            Las nuevas imágenes se guardarán automáticamente en Cloudflare R2.
+                                        {% else %}
+                                            Configure USE_CLOUDFLARE_R2=true en su archivo .env para habilitar.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Estadísticas -->
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-chart-bar"></i> Estadísticas</h5>
+                                    <div class="row">
+                                        <div class="col-6 text-center">
+                                            <h3 class="text-primary">{{ total_fotos }}</h3>
+                                            <small>Total de Fotos</small>
+                                        </div>
+                                        <div class="col-6 text-center">
+                                            <h3 class="text-success">{{ fotos_locales }}</h3>
+                                            <small>Archivos Locales</small>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-12 text-center">
+                                            <h3 class="text-warning">{{ fotos_sin_archivo }}</h3>
+                                            <small>Archivos Faltantes</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Comandos disponibles -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-terminal"></i> Comandos de Gestión</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Utiliza estos comandos desde la terminal para gestionar las imágenes:</p>
+                            
+                            <div class="mb-3">
+                                <h6>Migrar todas las imágenes a R2:</h6>
+                                <code class="bg-dark text-light p-2 d-block">
+                                    python manage.py migrate_images_to_r2
+                                </code>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6>Simulación (dry-run) para ver qué se migraría:</h6>
+                                <code class="bg-dark text-light p-2 d-block">
+                                    python manage.py migrate_images_to_r2 --dry-run
+                                </code>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6>Migrar solo un reporte específico:</h6>
+                                <code class="bg-dark text-light p-2 d-block">
+                                    python manage.py migrate_images_to_r2 --reporte-id=UUID_DEL_REPORTE
+                                </code>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6>Limitar cantidad de imágenes (para pruebas):</h6>
+                                <code class="bg-dark text-light p-2 d-block">
+                                    python manage.py migrate_images_to_r2 --limit=10
+                                </code>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <h6>Probar conexión con Cloudflare R2:</h6>
+                                <code class="bg-dark text-light p-2 d-block">
+                                    python manage.py cloudflare_r2 --action=test
+                                </code>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <a href="{% url 'reportsservice:reportes' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver a Reportes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

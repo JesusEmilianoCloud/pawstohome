@@ -1,0 +1,123 @@
+{% extends 'pawtohome/base.html' %}
+
+{% block title %}Resubir Imagen a R2{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-cloud-upload-alt"></i> Resubir Imagen a Cloudflare R2</h4>
+                </div>
+                <div class="card-body">
+                    <!-- Información de la imagen -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            {% if foto.imagen %}
+                                <img src="{{ foto.imagen.url }}" alt="Imagen del reporte" class="img-fluid rounded">
+                            {% else %}
+                                <div class="bg-light p-4 rounded text-center">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                    <p class="mt-2">Sin imagen</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <h5>Información de la Imagen</h5>
+                            <table class="table table-sm">
+                                <tr>
+                                    <td><strong>ID de la Foto:</strong></td>
+                                    <td>{{ foto.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reporte:</strong></td>
+                                    <td>
+                                        <a href="{% url 'reportsservice:detalle_reporte' foto.reporte.id %}">
+                                            {{ foto.reporte.nombre_perro }} ({{ foto.reporte.id }})
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Archivo:</strong></td>
+                                    <td>{{ foto.imagen.name|default:"Sin archivo" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Descripción:</strong></td>
+                                    <td>{{ foto.descripcion|default:"Sin descripción" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Es Principal:</strong></td>
+                                    <td>
+                                        {% if foto.es_principal %}
+                                            <span class="badge badge-success">Sí</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">No</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Estado de R2 y de la imagen -->
+                    <div class="alert {% if r2_enabled %}alert-info{% else %}alert-warning{% endif %}" role="alert">
+                        {% if r2_enabled %}
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Cloudflare R2 está habilitado.</strong>
+                            {% if exists_in_r2 %}
+                                Esta imagen ya existe en Cloudflare R2.
+                            {% else %}
+                                Esta imagen no ha sido subida a Cloudflare R2.
+                            {% endif %}
+                        {% else %}
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Cloudflare R2 está deshabilitado.</strong>
+                            Configure USE_CLOUDFLARE_R2=true en su archivo .env para poder subir imágenes.
+                        {% endif %}
+                    </div>
+                    
+                    {% if r2_enabled %}
+                        <!-- Formulario de confirmación -->
+                        <form method="post" class="text-center">
+                            {% csrf_token %}
+                            
+                            {% if exists_in_r2 %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    La imagen ya existe en R2. ¿Desea sobrescribirla?
+                                </div>
+                            {% endif %}
+                            
+                            <p class="mb-4">
+                                {% if exists_in_r2 %}
+                                    ¿Está seguro de que desea resubir esta imagen a Cloudflare R2?
+                                {% else %}
+                                    ¿Desea subir esta imagen a Cloudflare R2?
+                                {% endif %}
+                            </p>
+                            
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    {% if exists_in_r2 %}Resubir{% else %}Subir{% endif %} a R2
+                                </button>
+                                <a href="{% url 'reportsservice:detalle_reporte' foto.reporte.id %}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+                    {% else %}
+                        <!-- Solo mostrar botón de cancelar si R2 no está habilitado -->
+                        <div class="text-center">
+                            <a href="{% url 'reportsservice:detalle_reporte' foto.reporte.id %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Volver al Reporte
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
