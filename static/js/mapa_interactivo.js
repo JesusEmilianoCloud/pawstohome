@@ -59,10 +59,17 @@ class MapaInteractivo {
     }
     
     crearMapa() {
-        // Inicializar mapa centrado en Colombia
+        // Usar configuración inicial desde el template
+        const config = window.MapConfig || {
+            initialLat: 31.6904,   // Ciudad Juárez por defecto
+            initialLng: -106.4245,
+            initialZoom: 11
+        };
+        
+        // Inicializar mapa
         this.mapa = L.map('mapa', {
-            center: [4.5709, -74.2973], // Bogotá
-            zoom: 6,
+            center: [config.initialLat, config.initialLng],
+            zoom: config.initialZoom,
             zoomControl: false
         });
         
@@ -79,6 +86,9 @@ class MapaInteractivo {
         
         // Agregar grupo de marcadores al mapa
         this.mapa.addLayer(this.marcadores);
+        
+        // Si viene desde el detalle de un reporte, agregar marcador destacado
+        this.agregarMarcadorDestacado();
     }
     
     configurarEventListeners() {
@@ -655,6 +665,64 @@ class MapaInteractivo {
             }, 300);
         }, tipo === 'error' ? 5000 : 3000);
     }
+    
+    // Método para agregar marcador destacado cuando viene desde detalle del reporte
+    agregarMarcadorDestacado() {
+        const config = window.MapConfig || {};
+        
+        // Solo agregar marcador si tenemos coordenadas específicas y información del reporte
+        if (config.initialLat && config.initialLng && config.initialNombre) {
+            // Determinar color del marcador (rojo para perdido por defecto)
+            const color = '#dc3545';
+            const icono = '📍';
+            
+            // Crear icono usando el mismo estilo que los marcadores normales
+            const iconoDestacado = L.divIcon({
+                className: 'custom-marker',
+                html: `<div class="marker-pin" style="background-color: ${color}; transform: rotate(-45deg) scale(1.2); box-shadow: 0 4px 12px rgba(0,0,0,0.4), 0 0 0 3px rgba(220, 53, 69, 0.3); animation: pulse-marcador 2s infinite;">
+                         <div class="marker-icon" style="transform: rotate(45deg);">${icono}</div>
+                       </div>`,
+                iconSize: [36, 50],
+                iconAnchor: [18, 50],
+                popupAnchor: [0, -50]
+            });
+            
+            // Crear marcador
+            const marcadorDestacado = L.marker([config.initialLat, config.initialLng], {
+                icon: iconoDestacado,
+                zIndexOffset: 1000 // Asegurar que esté encima de otros marcadores
+            }).addTo(this.mapa);
+            
+            // Crear contenido del popup usando el mismo formato que los popups normales
+            const popupContent = `
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <span class="popup-status perdido">UBICACIÓN</span>
+                    </div>
+                    <h3 class="popup-name">${config.initialNombre}</h3>
+                    ${config.initialZona || config.initialDireccion ? `
+                        <div class="popup-details">
+                            ${config.initialZona ? `<strong>Zona:</strong> ${config.initialZona}<br>` : ''}
+                            ${config.initialDireccion ? `<strong>Dirección:</strong> ${config.initialDireccion}<br>` : ''}
+                            <strong>Coordenadas:</strong> ${parseFloat(config.initialLat).toFixed(4)}, ${parseFloat(config.initialLng).toFixed(4)}
+                        </div>
+                    ` : ''}
+                    <div class="popup-actions">
+                        <button class="popup-btn popup-btn-primary" onclick="window.history.back()">
+                            ← Volver al Detalle
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            marcadorDestacado.bindPopup(popupContent);
+            
+            // Abrir popup automáticamente
+            setTimeout(() => {
+                marcadorDestacado.openPopup();
+            }, 500);
+        }
+    }
 }
 
 // CSS adicional para marcadores personalizados
@@ -749,6 +817,8 @@ const estilosMarcadores = `
                 opacity: 0;
             }
         }
+        
+
     </style>
 `;
 

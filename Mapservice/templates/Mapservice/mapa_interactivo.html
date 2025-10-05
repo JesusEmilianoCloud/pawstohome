@@ -132,11 +132,19 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
         crossorigin=""></script>
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
-        crossorigin=""></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+<script>
+// Configuración inicial del mapa desde Django
+window.MapConfig = {
+    initialLat: {% if initial_lat %}{{ initial_lat }}{% else %}31.6904{% endif %}, // Ciudad Juárez por defecto
+    initialLng: {% if initial_lng %}{{ initial_lng }}{% else %}-106.4245{% endif %},
+    initialZoom: {% if initial_lat and initial_lng %}16{% else %}11{% endif %}, // Zoom alto si viene de detalle
+    initialDireccion: '{{ initial_direccion|default:"" }}',
+    initialZona: '{{ initial_zona|default:"" }}',
+    initialNombre: '{{ initial_nombre|default:"" }}'
+};
+</script>
 
 <!-- JavaScript del mapa -->
 <script src="{% static 'js/mapa_interactivo.js' %}"></script>
