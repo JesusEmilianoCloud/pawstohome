@@ -8,35 +8,55 @@
 {% endblock %}
 
 {% block content %}
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-orange">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1>Bienvenido {{ profile_user.first_name }}</h1>
+            <p class="hero-subtitle">Tu perfil en PawsToHome</p>
+        </div>
+    </div>
+    <!-- Animación de onda -->
+    <div class="wave-animation">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,60L40,65C80,70,160,80,240,75C320,70,400,50,480,45C560,40,640,50,720,65C800,80,880,100,960,100C1040,100,1120,80,1160,70L1200,60V120H1160C1120,120,1040,120,960,120C880,120,800,120,720,120C640,120,560,120,480,120C400,120,320,120,240,120C160,120,80,120,40,120H0V60Z" class="wave-path wave-1"></path>
+            <path d="M0,80L40,75C80,70,160,60,240,65C320,70,400,90,480,95C560,100,640,90,720,75C800,60,880,40,960,40C1040,40,1120,60,1160,70L1200,80V120H1160C1120,120,1040,120,960,120C880,120,800,120,720,120C640,120,560,120,480,120C400,120,320,120,240,120C160,120,80,120,40,120H0V80Z" class="wave-path wave-2"></path>
+            <path d="M0,40L40,50C80,60,160,80,240,85C320,90,400,80,480,70C560,60,640,50,720,55C800,60,880,80,960,85C1040,90,1120,80,1160,75L1200,70V120H1160C1120,120,1040,120,960,120C880,120,800,120,720,120C640,120,560,120,480,120C400,120,320,120,240,120C160,120,80,120,40,120H0V40Z" class="wave-path wave-3"></path>
+        </svg>
+    </div>
+</section>
+
 <div class="profile-detail-container">
     <div class="profile-header">
-        <div class="profile-avatar">
-            {% if configuracion and configuracion.has_profile_photo %}
-                <img src="{{ configuracion.get_profile_photo_url }}" 
-                     alt="Foto de {{ profile_user.first_name }}" 
-                     class="avatar-photo">
-            {% else %}
-                <div class="avatar-circle">
-                    <span class="avatar-initials">
-                        {{ profile_user.first_name|first|upper }}{{ profile_user.last_name|first|upper }}
-                    </span>
-                </div>
-            {% endif %}
+        <div class="profile-main-info">
+            <div class="profile-avatar">
+                {% if configuracion and configuracion.has_profile_photo %}
+                    <img src="{{ configuracion.get_profile_photo_url }}" 
+                         alt="Foto de {{ profile_user.first_name }}" 
+                         class="avatar-photo">
+                {% else %}
+                    <div class="avatar-circle">
+                        <span class="avatar-initials">
+                            {{ profile_user.first_name|first|upper }}{{ profile_user.last_name|first|upper }}
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="profile-info">
+                <h2 class="profile-name">{{ profile_user.first_name }} {{ profile_user.last_name }}</h2>
+                <p class="profile-username">@{{ profile_user.username }}</p>
+            </div>
         </div>
         
-        <div class="profile-info">
-            <h1 class="profile-name">{{ profile_user.first_name }} {{ profile_user.last_name }}</h1>
-            <p class="profile-username">@{{ profile_user.username }}</p>
-            
-            {% if user == profile_user %}
-                <div class="profile-actions">
-                    <a href="{% url 'ProfileService:edit_profile' %}" class="btn btn-primary">
-                        <span>✏️</span>
-                        Editar Perfil
-                    </a>
-                </div>
-            {% endif %}
-        </div>
+        {% if user == profile_user %}
+            <div class="profile-actions">
+                <a href="{% url 'ProfileService:edit_profile' %}" class="btn btn-primary">
+                    <span>✏️</span>
+                    Editar Perfil
+                </a>
+            </div>
+        {% endif %}
     </div>
 
     <div class="profile-content">
