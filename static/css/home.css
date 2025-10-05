@@ -410,6 +410,36 @@
     transform: scale(1.05);
 }
 
+/* Estilos mejorados para imágenes de mascotas */
+.pet-main-image {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.pet-card:hover .pet-main-image {
+    transform: scale(1.05);
+}
+
+.pet-image-fallback {
+    width: 100%; 
+    height: 100%; 
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    background: #F3F4F6;
+}
+
+.pet-image-placeholder {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+    width: 100%; 
+    height: 100%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
 .pet-status {
     position: absolute;
     top: 12px;
