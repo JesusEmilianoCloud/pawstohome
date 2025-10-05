@@ -8,28 +8,119 @@
 {% endblock %}
 
 {% block content %}
-<div class="reports-container">
-    <!-- Header de la página -->
-    <div class="reports-header">
-        <div class="header-content">
-            <h1 class="reports-title">🐾 Reportes de Mascotas</h1>
-            <p class="reports-subtitle">Ayuda a reunir familias en Ciudad Juárez</p>
+<!-- Hero Section -->
+<section class="hero-section bg-gradient-orange">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1>Reportes de Mascotas</h1>
+        </div>
+    </div>
+    <!-- Animación de onda -->
+    <div class="wave-animation">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+            <path d="M0,60L40,65C80,70,160,80,240,75C320,70,400,50,480,45C560,40,640,50,720,65C800,80,880,100,960,100C1040,100,1120,80,1160,70L1200,60V120H1160C1120,120,1040,120,960,120C880,120,800,120,720,120C640,120,560,120,480,120C400,120,320,120,240,120C160,120,80,120,40,120H0V60Z" class="wave-path wave-1"></path>
+            <path d="M0,80L40,75C80,70,160,60,240,65C320,70,400,90,480,95C560,100,640,90,720,75C800,60,880,40,960,40C1040,40,1120,60,1160,70L1200,80V120H1160C1120,120,1040,120,960,120C880,120,800,120,720,120C640,120,560,120,480,120C400,120,320,120,240,120C160,120,80,120,40,120H0V80Z" class="wave-path wave-2"></path>
+            <path d="M0,40L40,50C80,60,160,80,240,85C320,90,400,80,480,70C560,60,640,50,720,55C800,60,880,80,960,85C1040,90,1120,80,1160,75L1200,70V120H1160C1120,120,1040,120,960,120C880,120,800,120,720,120C640,120,560,120,480,120C400,120,320,120,240,120C160,120,80,120,40,120H0V40Z" class="wave-path wave-3"></path>
+        </svg>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="stats-section">
+    <div class="section-container">
+        <h2 class="section-title">Estadísticas en Tiempo Real</h2>
+        <p class="section-subtitle">Conoce el impacto de nuestra comunidad en Ciudad Juárez</p>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">�</div>
+                <div class="stat-info">
+                    <h3>{{ estadisticas.perdidos|default:3 }}</h3>
+                    <p>Mascotas Perdidas</p>
+                </div>
+            </div>
             
-            <div class="header-actions">
-                <a href="{% url 'reportsservice:crear_reporte' %}" class="btn btn-primary">
-                    <span>📝</span>
-                    Crear Reporte
-                </a>
-                <button class="btn btn-outline" id="toggle-filters">
-                    <span>🔍</span>
-                    Filtros
-                </button>
+            <div class="stat-card">
+                <div class="stat-icon">🏠</div>
+                <div class="stat-info">
+                    <h3>{{ estadisticas.encontrados|default:3 }}</h3>
+                    <p>Mascotas Encontradas</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">💚</div>
+                <div class="stat-info">
+                    <h3>{{ estadisticas.cerrados|default:0 }}</h3>
+                    <p>Casos Cerrados</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-info">
+                    <h3>{{ estadisticas.total|default:6 }}</h3>
+                    <p>Total de Reportes</p>
+                </div>
             </div>
         </div>
     </div>
+</section>
 
-    <!-- Filtros -->
-    <div class="filters-section" id="filters-panel">
+<!-- Quick Actions Section -->
+<section class="quick-actions-section">
+    <div class="section-container">
+        <h2 class="section-title">Acciones Rápidas</h2>
+        <p class="section-subtitle">¿Qué necesitas hacer hoy?</p>
+        
+        <div class="actions-grid">
+            <div class="action-card card-red">
+                <div class="action-icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                </div>
+                <div class="action-content">
+                    <h3 class="action-title">Reportar Mascota Perdida</h3>
+                    <p class="action-description">¿Perdiste a tu mascota? Crea un reporte detallado para que la comunidad te ayude a encontrarla.</p>
+                    <a href="{% url 'reportsservice:crear_reporte' %}" class="action-btn btn-red">Crear Reporte</a>
+                </div>
+            </div>
+
+            <div class="action-card card-green">
+                <div class="action-icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/>
+                        <path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z"/>
+                    </svg>
+                </div>
+                <div class="action-content">
+                    <h3 class="action-title">Explorar en el Mapa</h3>
+                    <p class="action-description">Visualiza todos los reportes en nuestro mapa interactivo y encuentra casos cerca de ti.</p>
+                    <a href="{% url 'Mapservice:mapa_interactivo' %}" class="action-btn btn-green">Ver Mapa</a>
+                </div>
+            </div>
+
+            <div class="action-card card-blue">
+                <div class="action-icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
+                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+                    </svg>
+                </div>
+                <div class="action-content">
+                    <h3 class="action-title">Filtrar Reportes</h3>
+                    <p class="action-description">Usa nuestros filtros avanzados para encontrar reportes específicos por tipo, tamaño, zona y más.</p>
+                    <button class="action-btn btn-blue" onclick="document.getElementById('filters-panel').style.display='block'">Abrir Filtros</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filtros (mantenemos la funcionalidad existente pero con mejor diseño) -->
+<div class="filters-section" id="filters-panel" style="display: none;">
+    <div class="section-container">
         <form method="get" class="filters-form">
             <div class="filters-grid">
                 <div class="filter-group">
@@ -75,69 +166,31 @@
             <div class="filters-actions">
                 <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
                 <a href="{% url 'reportsservice:reportes' %}" class="btn btn-outline">Limpiar</a>
+                <button type="button" class="btn btn-outline" onclick="document.getElementById('filters-panel').style.display='none'">Cerrar</button>
             </div>
         </form>
     </div>
+</div>
 
-    <!-- Estadísticas rápidas -->
-    <div class="stats-section">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">🔍</div>
-                <div class="stat-info">
-                    <h3>{{ stats.perdidos }}</h3>
-                    <p>Mascotas Perdidas</p>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">🏠</div>
-                <div class="stat-info">
-                    <h3>{{ stats.encontrados }}</h3>
-                    <p>Mascotas Encontradas</p>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">💚</div>
-                <div class="stat-info">
-                    <h3>{{ stats.reunidos }}</h3>
-                    <p>Casos Cerrados</p>
-                </div>
-            </div>
-            
-            <div class="stat-card">
-                <div class="stat-icon">📍</div>
-                <div class="stat-info">
-                    <h3>{{ stats.total }}</h3>
-                    <p>Total de Reportes</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lista de reportes -->
-    <div class="reports-list">
+<!-- Reports Section -->
+<section id="reports-section" class="reports-section">
+    <div class="section-container">
+        <h2 class="section-title">Reportes Activos</h2>
+        <p class="section-subtitle">Mascotas que necesitan tu ayuda para regresar a casa</p>
+        
         {% if reportes %}
             <div class="reports-grid">
                 {% for reporte in reportes %}
-                <div class="report-card {% if reporte.tipo_reporte == 'perdido' %}lost{% else %}found{% endif %}">
+                <div class="report-card">
                     <div class="report-image">
                         {% if reporte.fotos.exists %}
-                            <img src="{{ reporte.fotos.first.imagen.url }}" alt="{{ reporte.nombre_perro }}">
+                            <img src="{{ reporte.fotos.first.imagen.url }}" alt="{{ reporte.nombre_perro }}" class="pet-main-image">
                         {% else %}
-                            <div class="no-image">
-                                <span>📷</span>
-                                <p>Sin foto</p>
-                            </div>
+                            <div class="sample-pet-image">�</div>
                         {% endif %}
                         
-                        <div class="report-badge">
-                            {% if reporte.tipo_reporte == 'perdido' %}
-                                <span class="badge badge-lost">🔍 Perdido</span>
-                            {% else %}
-                                <span class="badge badge-found">🏠 Encontrado</span>
-                            {% endif %}
+                        <div class="report-status {% if reporte.tipo_reporte == 'perdido' %}lost{% else %}found{% endif %}">
+                            {% if reporte.tipo_reporte == 'perdido' %}Perdido{% else %}Encontrado{% endif %}
                         </div>
                     </div>
                     
@@ -176,18 +229,11 @@
                         </p>
                     </div>
                     
-                    <div class="report-footer">
-                        <div class="report-meta">
-                            <span class="report-time">
-                                Reportado {{ reporte.fecha_reporte|timesince }} atrás
-                            </span>
-                        </div>
-                        
-                        <div class="report-actions">
-                            <a href="{% url 'reportsservice:detalle_reporte' reporte.id %}" class="btn btn-sm btn-primary">
-                                Ver Detalle
-                            </a>
-                        </div>
+                    <div class="report-actions">
+                        <a href="{% url 'reportsservice:detalle_reporte' reporte.id %}" class="report-btn btn-primary">Ver Detalles</a>
+                        <a href="{% url 'reportsservice:detalle_reporte' reporte.id %}" class="report-btn btn-secondary">
+                            {% if reporte.tipo_reporte == 'perdido' %}Contactar{% else %}¿Es Tuyo?{% endif %}
+                        </a>
                     </div>
                 </div>
                 {% endfor %}
@@ -218,16 +264,16 @@
                 <div class="no-reports-icon">🐾</div>
                 <h3>No se encontraron reportes</h3>
                 <p>No hay reportes que coincidan con tus criterios de búsqueda.</p>
-                <a href="{% url 'reportsservice:crear_reporte' %}" class="btn btn-primary">
-                    <span>📝</span>
+                <a href="{% url 'reportsservice:crear_reporte' %}" class="btn-cta">
                     Crear el primer reporte
                 </a>
             </div>
         {% endif %}
-    </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
-<script src="{% static 'js/reportes.js' %}"></script>
+        <div class="section-cta">
+            <p>¿No encuentras lo que buscas?</p>
+            <a href="{% url 'reportsservice:crear_reporte' %}" class="btn-cta">Crear Nuevo Reporte</a>
+        </div>
+    </div>
+</section>
 {% endblock %}
