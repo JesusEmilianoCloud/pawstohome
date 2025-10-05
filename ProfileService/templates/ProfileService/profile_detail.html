@@ -66,35 +66,38 @@
                 Información Personal
             </h2>
             
-            <div class="info-grid">
-                <div class="info-item">
-                    <label>Nombre Completo</label>
-                    <span>{{ profile_user.first_name }} {{ profile_user.last_name }}</span>
+            <div class="info-list">
+                <div class="info-row">
+                    <label class="info-label">Name</label>
+                    <span class="info-value">{{ profile_user.first_name }} {{ profile_user.last_name }}</span>
                 </div>
                 
-                <div class="info-item">
-                    <label>Nombre de Usuario</label>
-                    <span>{{ profile_user.username }}</span>
+                <div class="info-row">
+                    <label class="info-label">Email account</label>
+                    <span class="info-value">{{ profile_user.email|default:"No email provided" }}</span>
                 </div>
-                
-                {% if user == profile_user or profile_user.email %}
-                <div class="info-item">
-                    <label>Correo Electrónico</label>
-                    <span>{{ profile_user.email }}</span>
-                </div>
-                {% endif %}
                 
                 {% if user == profile_user and profile_user.phone_number %}
-                <div class="info-item">
-                    <label>Teléfono</label>
-                    <span>{{ profile_user.phone_number }}</span>
+                <div class="info-row">
+                    <label class="info-label">Mobile number</label>
+                    <span class="info-value">{{ profile_user.phone_number }}</span>
+                </div>
+                {% else %}
+                <div class="info-row">
+                    <label class="info-label">Mobile number</label>
+                    <span class="info-value info-placeholder">Add number</span>
                 </div>
                 {% endif %}
 
                 {% if configuracion and configuracion.tiene_direccion %}
-                <div class="info-item">
-                    <label>Dirección</label>
-                    <span class="address-text">{{ configuracion.direccion }}</span>
+                <div class="info-row">
+                    <label class="info-label">Location</label>
+                    <span class="info-value">{{ configuracion.direccion }}</span>
+                </div>
+                {% else %}
+                <div class="info-row">
+                    <label class="info-label">Location</label>
+                    <span class="info-value info-placeholder">Add location</span>
                 </div>
                 {% endif %}
                 
