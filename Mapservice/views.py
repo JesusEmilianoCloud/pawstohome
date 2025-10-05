@@ -11,8 +11,20 @@ def mapa_interactivo(request):
     # Obtener todas las razas para el filtro
     razas = Raza.objects.all().order_by('nombre')
     
+    # Obtener parámetros de ubicación específica si vienen del detalle del reporte
+    lat = request.GET.get('lat', '')
+    lng = request.GET.get('lng', '')
+    direccion = request.GET.get('direccion', '')
+    zona = request.GET.get('zona', '')
+    nombre = request.GET.get('nombre', '')
+    
     context = {
         'razas': razas,
+        'initial_lat': lat,
+        'initial_lng': lng,
+        'initial_direccion': direccion,
+        'initial_zona': zona,
+        'initial_nombre': nombre,
     }
     
     return render(request, 'Mapservice/mapa_interactivo.html', context)
