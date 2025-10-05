@@ -228,3 +228,55 @@ def obtener_direccion_desde_coordenadas_ajax(request):
         'success': False,
         'error': 'Método no permitido'
     })
+
+def user_reports_view(request, user_id):
+    """
+    Vista para mostrar todos los reportes de un usuario específico.
+    """
+    from reportsservice.models import Reporte
+    from django.core.paginator import Paginator
+    
+    # Obtener el usuario
+    profile_user = get_object_or_404(User, pk=user_id)
+    
+    # Obtener todos los reportes del usuario visibles
+    reportes = Reporte.objects.filter(
+        usuario=profile_user,
+        visible=True
+    ).select_related('raza').prefetch_related('fotos').order_by('-fecha_reporte')
+    
+    # Filtros opcionales
+    tipo_reporte = request.GET.get('tipo')
+    estado = request.GET.get('estado')
+    
+    if tipo_reporte:
+        reportes = reportes.filter(tipo_reporte=tipo_reporte)
+    
+    if estado:
+        reportes = reportes.filter(estado=estado)
+    
+    # Estadísticas del usuario
+    stats = {
+        'total': Reporte.objects.filter(usuario=profile_user, visible=True).count(),
+        'perdidos': Reporte.objects.filter(usuario=profile_user, tipo_reporte='perdido', visible=True).count(),
+        'encontrados': Reporte.objects.filter(usuario=profile_user, tipo_reporte='encontrado', visible=True).count(),
+        'activos': Reporte.objects.filter(usuario=profile_user, estado='activo', visible=True).count(),
+        'cerrados': Reporte.objects.filter(usuario=profile_user, estado='cerrado', visible=True).count(),
+    }
+    
+    # Paginación
+    paginator = Paginator(reportes, 12)  # 12 reportes por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'profile_user': profile_user,
+        'reportes': page_obj,
+        'stats': stats,
+        'is_paginated': page_obj.has_other_pages(),
+        'page_obj': page_obj,
+        'current_tipo': tipo_reporte,
+        'current_estado': estado,
+    }
+    
+    return render(request, 'ProfileService/user_reports.html', context)

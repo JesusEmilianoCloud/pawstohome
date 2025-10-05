@@ -607,6 +607,22 @@
     text-decoration: none;
 }
 
+.btn-outline {
+    background: transparent;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.btn-outline:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+    color: #2d3748;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .hero-section {

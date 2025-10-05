@@ -1,0 +1,286 @@
+{% extends 'Homeinfo/base.html' %}
+{% load static %}
+
+{% block title %}Reportes de {{ profile_user.first_name }} {{ profile_user.last_name }} - PawsToHome{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/reportes.css' %}">
+<style>
+.user-reports-header {
+    background: linear-gradient(90deg, var(--orange-medium) 0%, var(--orange-light) 100%);
+    color: white;
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: bold;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-details h1 {
+    font-size: 2.5rem;
+    margin: 0 0 0.5rem 0;
+}
+
+.user-details p {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.back-button {
+    margin-top: 1rem;
+}
+
+.back-button a {
+    color: white;
+    text-decoration: none;
+    font-weight: 600;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.back-button a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    color: white;
+}
+
+.stats-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.stat-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--orange-light);
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .user-info {
+        flex-direction: column;
+    }
+    
+    .user-details h1 {
+        font-size: 2rem;
+    }
+    
+    .stats-summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- User Reports Header -->
+<section class="user-reports-header">
+    <div class="hero-container">
+        <div class="user-info">
+            <div class="user-avatar">
+                {{ profile_user.first_name|first|upper }}{{ profile_user.last_name|first|upper }}
+            </div>
+            <div class="user-details">
+                <h1>Reportes de {{ profile_user.first_name }}</h1>
+                <p>Todos los reportes publicados por {{ profile_user.first_name }} {{ profile_user.last_name }}</p>
+            </div>
+        </div>
+        
+        <div class="stats-summary">
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.total }}</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.perdidos }}</div>
+                <div class="stat-label">Perdidos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.encontrados }}</div>
+                <div class="stat-label">Encontrados</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.activos }}</div>
+                <div class="stat-label">Activos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">{{ stats.cerrados }}</div>
+                <div class="stat-label">Cerrados</div>
+            </div>
+        </div>
+        
+        <div class="back-button">
+            <a href="{% url 'ProfileService:profile' profile_user.id %}">
+                ← Volver al Perfil
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Filters Section -->
+<section class="filters-section">
+    <div class="section-container">
+        <form method="get" class="filters-form">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="tipo">Tipo de Reporte</label>
+                    <select name="tipo" id="tipo" class="form-control">
+                        <option value="">Todos</option>
+                        <option value="perdido" {% if current_tipo == 'perdido' %}selected{% endif %}>Perdido</option>
+                        <option value="encontrado" {% if current_tipo == 'encontrado' %}selected{% endif %}>Encontrado</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="estado">Estado</label>
+                    <select name="estado" id="estado" class="form-control">
+                        <option value="">Todos</option>
+                        <option value="activo" {% if current_estado == 'activo' %}selected{% endif %}>Activo</option>
+                        <option value="en_proceso" {% if current_estado == 'en_proceso' %}selected{% endif %}>En Proceso</option>
+                        <option value="cerrado" {% if current_estado == 'cerrado' %}selected{% endif %}>Cerrado</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filters-actions">
+                <button type="submit" class="btn btn-primary">Aplicar Filtros</button>
+                <a href="{% url 'ProfileService:user_reports' profile_user.id %}" class="btn btn-outline">Limpiar</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Reports Section -->
+<section class="reports-section">
+    <div class="section-container">
+        {% if reportes %}
+            <div class="reports-grid">
+                {% for reporte in reportes %}
+                <div class="report-card">
+                    <div class="report-image">
+                        {% if reporte.fotos.exists %}
+                            <img src="{{ reporte.fotos.first.imagen.url }}" alt="{{ reporte.nombre_perro }}" class="pet-main-image">
+                        {% else %}
+                            <div class="sample-pet-image">🐕</div>
+                        {% endif %}
+                        
+                        <div class="report-status {% if reporte.tipo_reporte == 'perdido' %}lost{% else %}found{% endif %}">
+                            {% if reporte.tipo_reporte == 'perdido' %}Perdido{% else %}Encontrado{% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="report-content">
+                        <h3 class="report-name">{{ reporte.nombre_perro }}</h3>
+                        
+                        <div class="report-details">
+                            <div class="detail-item">
+                                <span class="detail-icon">🏷️</span>
+                                <span>{{ reporte.raza.nombre|default:"Sin raza especificada" }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-icon">📏</span>
+                                <span>{{ reporte.get_tamano_display }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-icon">📍</span>
+                                <span>{{ reporte.zona|truncatechars:30 }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-icon">📅</span>
+                                <span>{{ reporte.fecha_reporte|date:"d M Y" }}</span>
+                            </div>
+                            
+                            <div class="detail-item">
+                                <span class="detail-icon">🏷️</span>
+                                <span>{{ reporte.get_estado_display }}</span>
+                            </div>
+                        </div>
+                        
+                        <p class="report-description">
+                            {{ reporte.descripcion|truncatechars:100 }}
+                        </p>
+                    </div>
+                    
+                    <div class="report-actions">
+                        <a href="{% url 'reportsservice:detalle_reporte' reporte.id %}" class="report-btn btn-primary">Ver Detalles</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Paginación -->
+            {% if is_paginated %}
+            <div class="pagination-section">
+                <div class="pagination">
+                    {% if page_obj.has_previous %}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1" class="page-link">Primera</a>
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" class="page-link">Anterior</a>
+                    {% endif %}
+                    
+                    <span class="page-info">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                    
+                    {% if page_obj.has_next %}
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" class="page-link">Siguiente</a>
+                        <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}" class="page-link">Última</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="no-reports">
+                <div class="no-reports-icon">🐾</div>
+                <h3>No hay reportes</h3>
+                {% if user == profile_user %}
+                    <p>Aún no has creado ningún reporte.</p>
+                    <a href="{% url 'reportsservice:crear_reporte' %}" class="btn-cta">
+                        Crear tu primer reporte
+                    </a>
+                {% else %}
+                    <p>{{ profile_user.first_name }} no ha creado ningún reporte aún.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
