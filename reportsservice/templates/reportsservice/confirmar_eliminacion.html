@@ -1,0 +1,182 @@
+{% extends 'Homeinfo/base.html' %}
+{% load static %}
+
+{% block title %}Eliminar Reporte - {{ reporte.nombre_perro }} - PawsToHome{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/reportes.css' %}">
+<style>
+.delete-confirmation {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.warning-icon {
+    text-align: center;
+    font-size: 4rem;
+    color: #e53e3e;
+    margin-bottom: 1rem;
+}
+
+.delete-title {
+    text-align: center;
+    font-size: 1.8rem;
+    color: #2d3748;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.delete-message {
+    text-align: center;
+    color: #4a5568;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.report-info {
+    background: #f7fafc;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border-left: 4px solid #e53e3e;
+}
+
+.report-info h4 {
+    color: #2d3748;
+    margin: 0 0 1rem 0;
+}
+
+.report-detail {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.report-detail:last-child {
+    margin-bottom: 0;
+}
+
+.report-label {
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.report-value {
+    color: #2d3748;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 140px;
+    text-align: center;
+    display: inline-block;
+}
+
+.btn-danger {
+    background: #e53e3e;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c53030;
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e0;
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: #4a5568;
+}
+
+@media (max-width: 768px) {
+    .delete-confirmation {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-confirmation">
+    <div class="warning-icon">⚠️</div>
+    
+    <h1 class="delete-title">Confirmar Eliminación</h1>
+    
+    <p class="delete-message">
+        ¿Estás seguro de que deseas eliminar este reporte? Esta acción no se puede deshacer.
+        <br><strong>Todas las imágenes asociadas también serán eliminadas permanentemente.</strong>
+    </p>
+    
+    <div class="report-info">
+        <h4>Información del Reporte:</h4>
+        
+        <div class="report-detail">
+            <span class="report-label">Nombre:</span>
+            <span class="report-value">{{ reporte.nombre_perro }}</span>
+        </div>
+        
+        <div class="report-detail">
+            <span class="report-label">Tipo:</span>
+            <span class="report-value">{{ reporte.get_tipo_reporte_display }}</span>
+        </div>
+        
+        <div class="report-detail">
+            <span class="report-label">Estado:</span>
+            <span class="report-value">{{ reporte.get_estado_display }}</span>
+        </div>
+        
+        <div class="report-detail">
+            <span class="report-label">Fecha de Creación:</span>
+            <span class="report-value">{{ reporte.fecha_creacion|date:"d/m/Y H:i" }}</span>
+        </div>
+        
+        <div class="report-detail">
+            <span class="report-label">Imágenes Asociadas:</span>
+            <span class="report-value">{{ reporte.fotos.count }} imagen(es)</span>
+        </div>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <button type="submit" class="btn btn-danger">
+                🗑️ Sí, Eliminar Reporte
+            </button>
+            <a href="{% url 'reportsservice:detalle_reporte' reporte.id %}" class="btn btn-secondary">
+                ↩️ Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

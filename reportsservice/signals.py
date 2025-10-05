@@ -1,7 +1,10 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, pre_delete
 from django.dispatch import receiver
 import math
 import logging
+import boto3
+from botocore.exceptions import ClientError
+from django.conf import settings
 from .models import Reporte, Avistamiento, Comentario, FotoReporte
 from .utils import upload_foto_reporte_to_r2
 from Homeinfo.models import Notificacion
@@ -146,3 +149,78 @@ def subir_foto_a_cloudflare_r2(sender, instance, created, **kwargs):
             # Si hay error, solo loggearlo pero no interrumpir el proceso principal
             logger.error(f"Error en signal de subida a R2 para FotoReporte {instance.id}: {str(e)}")
             pass
+
+def eliminar_imagen_de_cloudflare_r2(imagen_path):
+    """
+    Función para eliminar una imagen específica de Cloudflare R2
+    """
+    try:
+        # Configurar cliente S3 para Cloudflare R2
+        s3_client = boto3.client(
+            's3',
+            endpoint_url=settings.CLOUDFLARE_R2_ENDPOINT_URL,
+            aws_access_key_id=settings.CLOUDFLARE_R2_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.CLOUDFLARE_R2_SECRET_ACCESS_KEY,
+            region_name='auto'
+        )
+        
+        # Limpiar el path de la imagen (remover 'media/' si está presente)
+        if imagen_path.startswith('media/'):
+            imagen_path = imagen_path[6:]
+            
+        # Agregar el prefijo media/ para R2
+        r2_key = f"media/{imagen_path}"
+        
+        # Eliminar el archivo del bucket
+        response = s3_client.delete_object(
+            Bucket=settings.CLOUDFLARE_R2_BUCKET_NAME,
+            Key=r2_key
+        )
+        
+        logger.info(f"Imagen eliminada exitosamente de R2: {r2_key}")
+        return True
+        
+    except ClientError as e:
+        error_code = e.response['Error']['Code']
+        if error_code == 'NoSuchKey':
+            logger.warning(f"La imagen no existe en R2: {imagen_path}")
+        else:
+            logger.error(f"Error al eliminar imagen de R2: {str(e)}")
+        return False
+    except Exception as e:
+        logger.error(f"Error inesperado al eliminar imagen de R2: {str(e)}")
+        return False
+
+@receiver(pre_delete, sender=FotoReporte)
+def eliminar_foto_reporte_de_r2(sender, instance, **kwargs):
+    """
+    Signal para eliminar la imagen de Cloudflare R2 cuando se elimina una FotoReporte
+    """
+    if instance.imagen:
+        try:
+            imagen_path = str(instance.imagen)
+            eliminar_imagen_de_cloudflare_r2(imagen_path)
+            logger.info(f"Iniciada eliminación de imagen R2 para FotoReporte {instance.id}")
+        except Exception as e:
+            logger.error(f"Error al eliminar imagen R2 para FotoReporte {instance.id}: {str(e)}")
+
+@receiver(pre_delete, sender=Reporte)
+def eliminar_fotos_reporte_de_r2(sender, instance, **kwargs):
+    """
+    Signal para eliminar todas las imágenes asociadas a un reporte de Cloudflare R2
+    cuando se elimina el reporte
+    """
+    try:
+        # Obtener todas las fotos del reporte que se va a eliminar
+        fotos = FotoReporte.objects.filter(reporte=instance)
+        
+        for foto in fotos:
+            if foto.imagen:
+                imagen_path = str(foto.imagen)
+                eliminar_imagen_de_cloudflare_r2(imagen_path)
+                
+        if fotos.exists():
+            logger.info(f"Iniciada eliminación de {fotos.count()} imágenes R2 para Reporte {instance.id}")
+        
+    except Exception as e:
+        logger.error(f"Error al eliminar imágenes R2 para Reporte {instance.id}: {str(e)}")
