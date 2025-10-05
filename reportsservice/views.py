@@ -76,28 +76,59 @@ def detalle_reporte(request, id):
     return render(request, 'reportsservice/detalle_reporte.html', context)
 
 @login_required
+@login_required
 def crear_reporte(request):
     """
     Vista para crear un nuevo reporte
     """
     if request.method == 'POST':
         try:
+            # Validar campos requeridos
+            required_fields = [
+                'tipo_reporte', 'nombre_perro', 'color', 'tamano', 'descripcion',
+                'latitud', 'longitud', 'direccion', 'zona', 'fecha_incidente',
+                'telefono_contacto', 'email_contacto'
+            ]
+            
+            missing_fields = []
+            for field in required_fields:
+                if not request.POST.get(field):
+                    missing_fields.append(field)
+            
+            if missing_fields:
+                messages.error(request, f'Faltan los siguientes campos: {", ".join(missing_fields)}')
+                raise ValueError("Campos faltantes")
+            
+            # Validar coordenadas
+            try:
+                latitud = float(request.POST.get('latitud'))
+                longitud = float(request.POST.get('longitud'))
+                
+                if not (-90 <= latitud <= 90):
+                    raise ValueError("Latitud fuera de rango")
+                if not (-180 <= longitud <= 180):
+                    raise ValueError("Longitud fuera de rango")
+                    
+            except (ValueError, TypeError):
+                messages.error(request, 'Las coordenadas proporcionadas no son válidas')
+                raise ValueError("Coordenadas inválidas")
+            
             # Crear el reporte
             reporte = Reporte(
                 usuario=request.user,
                 tipo_reporte=request.POST.get('tipo_reporte'),
-                nombre_perro=request.POST.get('nombre_perro'),
-                color=request.POST.get('color'),
+                nombre_perro=request.POST.get('nombre_perro').strip(),
+                color=request.POST.get('color').strip(),
                 tamano=request.POST.get('tamano'),
-                descripcion=request.POST.get('descripcion'),
-                caracteristicas_distintivas=request.POST.get('caracteristicas_distintivas', ''),
-                latitud=float(request.POST.get('latitud')),
-                longitud=float(request.POST.get('longitud')),
-                direccion=request.POST.get('direccion'),
-                zona=request.POST.get('zona'),
+                descripcion=request.POST.get('descripcion').strip(),
+                caracteristicas_distintivas=request.POST.get('caracteristicas_distintivas', '').strip(),
+                latitud=latitud,
+                longitud=longitud,
+                direccion=request.POST.get('direccion').strip(),
+                zona=request.POST.get('zona').strip(),
                 fecha_incidente=request.POST.get('fecha_incidente'),
-                telefono_contacto=request.POST.get('telefono_contacto'),
-                email_contacto=request.POST.get('email_contacto'),
+                telefono_contacto=request.POST.get('telefono_contacto').strip(),
+                email_contacto=request.POST.get('email_contacto').strip(),
             )
             
             # Asignar raza si se seleccionó
@@ -112,27 +143,58 @@ def crear_reporte(request):
             
             # Procesar fotos
             fotos = request.FILES.getlist('fotos')
+            
+            # Validar fotos si las hay
+            if fotos:
+                allowed_types = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif']
+                max_size = 5 * 1024 * 1024  # 5MB
+                
+                for foto in fotos:
+                    if foto.content_type not in allowed_types:
+                        messages.error(request, f'Tipo de archivo no válido: {foto.name}. Solo se permiten JPG, PNG y GIF.')
+                        raise ValueError("Tipo de archivo inválido")
+                    
+                    if foto.size > max_size:
+                        messages.error(request, f'El archivo {foto.name} es muy grande. Máximo 5MB permitidos.')
+                        raise ValueError("Archivo muy grande")
+            
+            # Guardar fotos
             for i, foto in enumerate(fotos):
-                foto_reporte = FotoReporte(
-                    reporte=reporte,
-                    imagen=foto,
-                    es_principal=(i == 0),  # Primera foto es principal
-                    orden=i
-                )
-                foto_reporte.save()
+                try:
+                    foto_reporte = FotoReporte(
+                        reporte=reporte,
+                        imagen=foto,
+                        es_principal=(i == 0),  # Primera foto es principal
+                        orden=i
+                    )
+                    foto_reporte.save()
+                except Exception as foto_error:
+                    messages.warning(request, f'Error al procesar la foto {foto.name}: {str(foto_error)}')
+                    # Continuar con las demás fotos
             
             messages.success(request, 'Reporte creado exitosamente.')
             return redirect('reportsservice:detalle_reporte', id=reporte.id)
             
+        except ValueError:
+            # Error de validación ya mostrado
+            pass
         except Exception as e:
-            messages.error(request, f'Error al crear el reporte: {str(e)}')
+            messages.error(request, f'Error inesperado al crear el reporte: {str(e)}')
     
     # Obtener razas para el formulario
     razas = Raza.objects.all().order_by('nombre')
     
+    # Mantener los datos del formulario en caso de error
     context = {
         'razas': razas,
     }
+    
+    # Si hay datos POST y hubo errores, mantener los valores
+    if request.method == 'POST':
+        context.update({
+            'form_data': request.POST,
+            'preserve_files': request.FILES
+        })
     
     return render(request, 'reportsservice/crear_reporte.html', context)
 
