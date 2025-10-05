@@ -178,48 +178,94 @@
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .feature-card {
     background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    position: relative;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 }
 
-.feature-icon {
-    width: 80px;
-    height: 80px;
-    background: var(--orange-light);
-    border-radius: 50%;
+/* Bordes específicos para cada tarjeta */
+.feature-card.card-red:hover {
+    border-top: 3px solid var(--red);
+}
+
+.feature-card.card-blue:hover {
+    border-top: 3px solid var(--blue);
+}
+
+.feature-card.card-orange:hover {
+    border-top: 3px solid var(--orange-light);
+}
+
+.feature-card.card-green:hover {
+    border-top: 3px solid var(--green);
+}
+
+.feature-card-header {
+    padding: 1.5rem 1.5rem 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
+.feature-icon-container {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 1rem;
-    font-size: 2rem;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.feature-icon-container.geo {
+    background-color: #FFF5F5;
+    color: var(--red);
+}
+
+.feature-icon-container.security {
+    background-color: #EBF8FF;
+    color: var(--blue);
+}
+
+.feature-icon-container.data {
+    background-color: #FFFAF0;
+    color: var(--orange-light);
+}
+
+.feature-icon-container.guide {
+    background-color: #F0FFF4;
+    color: var(--green);
 }
 
 .feature-badge {
-    position: absolute;
-    top: 15px;
-    right: 15px;
     background: var(--red);
     color: white;
-    padding: 5px 10px;
-    border-radius: 15px;
+    padding: 4px 12px;
+    border-radius: 20px;
     font-size: var(--text-xs);
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .feature-badge.blue {
@@ -227,41 +273,89 @@
 }
 
 .feature-badge.orange {
-    background: var(--orange-dark);
+    background: var(--orange-light);
 }
 
 .feature-badge.green {
     background: var(--green);
 }
 
+.feature-card-body {
+    padding: 1rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
 .feature-title {
-    font-size: var(--h4-size);
-    color: #2c3e50;
-    margin-bottom: 1rem;
+    font-size: var(--text-xl);
+    color: #1A202C;
+    margin-bottom: 0.75rem;
     font-weight: 600;
+    font-family: 'Poppins', sans-serif;
 }
 
 .feature-description {
-    color: #666;
+    color: #4A5568;
     line-height: 1.6;
     margin-bottom: 1.5rem;
-    font-size: var(--text-base);
+    font-size: var(--text-sm);
+    flex: 1;
 }
 
 .feature-btn {
-    background: var(--orange-light);
+    background: var(--red);
     color: white;
-    padding: 10px 20px;
-    border-radius: 25px;
+    padding: 8px 16px;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: 600;
-    transition: background 0.3s ease;
-    display: inline-block;
+    transition: all 0.3s ease;
+    display: block;
     font-size: var(--text-sm);
+    border: none;
+    cursor: pointer;
+    width: 50%;
+    text-align: center;
+    margin-top: auto;
 }
 
 .feature-btn:hover {
-    background: var(--orange-medium);
+    background: #C53030;
+    transform: translateY(-1px);
+}
+
+/* Botones con colores específicos según su badge */
+.feature-btn.btn-red {
+    background: var(--red);
+}
+
+.feature-btn.btn-red:hover {
+    background: #C53030;
+}
+
+.feature-btn.btn-blue {
+    background: var(--blue);
+}
+
+.feature-btn.btn-blue:hover {
+    background: #2C5282;
+}
+
+.feature-btn.btn-orange {
+    background: var(--orange-light);
+}
+
+.feature-btn.btn-orange:hover {
+    background: #9C4221;
+}
+
+.feature-btn.btn-green {
+    background: var(--green);
+}
+
+.feature-btn.btn-green:hover {
+    background: #1E8449;
 }
 
 /* ========== SECCIÓN DE MASCOTAS ========== */
@@ -453,6 +547,25 @@
     .wave-animation svg {
         height: 80px;
     }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        max-width: none;
+    }
+
+    .feature-card-header {
+        padding: 1rem 1rem 0;
+    }
+
+    .feature-card-body {
+        padding: 0.75rem 1rem 1rem;
+    }
+
+    .feature-icon-container {
+        width: 50px;
+        height: 50px;
+        font-size: 1.25rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -480,5 +593,25 @@
 
     .wave-animation svg {
         height: 60px;
+    }
+
+    .features-grid {
+        gap: 1.5rem;
+    }
+
+    .feature-card-header {
+        padding: 1rem 1rem 0;
+    }
+
+    .feature-card-body {
+        padding: 0.5rem 1rem 1rem;
+    }
+
+    .feature-title {
+        font-size: var(--text-lg);
+    }
+
+    .feature-description {
+        font-size: var(--text-xs);
     }
 }

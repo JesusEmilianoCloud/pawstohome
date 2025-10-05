@@ -40,36 +40,60 @@
         <p class="section-subtitle">Una plataforma integral diseñada para reunir a las mascotas perdidas con sus familias de manera rápida y eficiente</p>
         
         <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-badge">Geo activo</div>
-                <div class="feature-icon">📍</div>
-                <h3 class="feature-title">Mapa Interactivo</h3>
-                <p class="feature-description">Visualiza en tiempo real todos los reportes de perros perdidos y encontrados en Ciudad Juárez. Utiliza geolocalización para encontrar casos cerca de ti.</p>
-                <a href="{% url 'reportsservice:reportes' %}" class="feature-btn">Explorar Mapa</a>
+            <div class="feature-card card-red">
+                <div class="feature-card-header">
+                    <div class="feature-icon-container geo">
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-map-pin"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" /><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" /></svg>
+                    </div>
+                    <div class="feature-badge">568 activos</div>
+                </div>
+                <div class="feature-card-body">
+                    <h3 class="feature-title">Mapa Interactivo</h3>
+                    <p class="feature-description">Visualiza en tiempo real todos los reportes de perros perdidos y encontrados en Ciudad Juárez. Utiliza geolocalización para encontrar casos cerca de ti.</p>
+                    <a href="{% url 'reportsservice:reportes' %}" class="feature-btn btn-red">Explorar Mapa</a>
+                </div>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-badge blue">100% Seguro</div>
-                <div class="feature-icon">🛡️</div>
-                <h3 class="feature-title">Seguro y confiable</h3>
-                <p class="feature-description">Protegemos tu información personal y verificamos la autenticidad de los reportes para una experiencia segura.</p>
-                <a href="{% url 'loginservice:login-register' %}" class="feature-btn">Crear Cuenta</a>
+            <div class="feature-card card-blue">
+                <div class="feature-card-header">
+                    <div class="feature-icon-container security">
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-shield"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 3a12 12 0 0 0 8.5 3a12 12 0 0 1 -8.5 15a12 12 0 0 1 -8.5 -15a12 12 0 0 0 8.5 -3" /></svg>
+                    </div>
+                    <div class="feature-badge blue">100% Seguro</div>
+                </div>
+                <div class="feature-card-body">
+                    <h3 class="feature-title">Seguro y confiable</h3>
+                    <p class="feature-description">Protegemos tu información personal y verificamos la autenticidad de los reportes para una experiencia segura.</p>
+                    <a href="{% url 'loginservice:login-register' %}" class="feature-btn btn-blue">Crear Cuenta</a>
+                </div>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-badge orange">Data Sensible</div>
-                <div class="feature-icon">📊</div>
-                <h3 class="feature-title">Seguimiento Inteligente</h3>
-                <p class="feature-description">Crea reportes completos con fotos, descripciones detalladas y efectúa el seguimiento de tu búsqueda hasta reunir con tu mascota.</p>
-                <a href="{% url 'reportsservice:crear_reporte' %}" class="feature-btn">Crear Reporte</a>
+            <div class="feature-card card-orange">
+                <div class="feature-card-header">
+                    <div class="feature-icon-container data">
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-chart-bar"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 13a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M15 9a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v10a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M9 5a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /><path d="M4 20h14" /></svg>
+                    </div>
+                    <div class="feature-badge orange">+200 Reunidos</div>
+                </div>
+                <div class="feature-card-body">
+                    <h3 class="feature-title">Seguimiento Inteligente</h3>
+                    <p class="feature-description">Crea reportes completos con fotos, descripciones detalladas y efectúa el seguimiento de tu búsqueda hasta reunir con tu mascota.</p>
+                    <a href="{% url 'reportsservice:crear_reporte' %}" class="feature-btn btn-orange">Crear Reporte</a>
+                </div>
             </div>
 
-            <div class="feature-card">
-                <div class="feature-badge green">Eco Linea</div>
-                <div class="feature-icon">💡</div>
-                <h3 class="feature-title">Guías de Prevención</h3>
-                <p class="feature-description">Aprende cómo prevenir que tu mascota se extravíe con consejos de expertos. Accede con contenidos de entrenamiento y cuidado responsable.</p>
-                <a href="#" class="feature-btn">Ver Guías</a>
+            <div class="feature-card card-green">
+                <div class="feature-card-header">
+                    <div class="feature-icon-container guide">
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="40"  height="40"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-bulb"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M3 12h1m8 -9v1m8 8h1m-15.4 -6.4l.7 .7m12.1 -.7l-.7 .7" /><path d="M9 16a5 5 0 1 1 6 0a3.5 3.5 0 0 0 -1 3a2 2 0 0 1 -4 0a3.5 3.5 0 0 0 -1 -3" /><path d="M9.7 17l4.6 0" /></svg>
+                    </div>
+                    <div class="feature-badge green">Tips Utiles</div>
+                </div>
+                <div class="feature-card-body">
+                    <h3 class="feature-title">Guías de Prevención</h3>
+                    <p class="feature-description">Aprende cómo prevenir que tu mascota se extravíe con consejos de expertos. Accede con contenidos de entrenamiento y cuidado responsable.</p>
+                    <a href="#" class="feature-btn btn-green">Ver Guías</a>
+                </div>
             </div>
         </div>
     </div>
