@@ -225,6 +225,138 @@
             </div>
         </div>
         {% endif %}
+
+        <!-- Sección de Eliminación de Cuenta (Solo para el propio usuario) -->
+        {% if user == profile_user %}
+        <div class="profile-section danger-section">
+            <h2 class="section-title danger-title">
+                <span class="section-icon">⚠️</span>
+                Zona de Peligro
+            </h2>
+            
+            <div class="danger-content">
+                <div class="danger-warning">
+                    <h3>Eliminar cuenta permanentemente</h3>
+                    <p>Esta acción no se puede deshacer. Se eliminará permanentemente tu cuenta y todos los datos asociados, incluyendo:</p>
+                    <ul>
+                        <li>Todos tus reportes de mascotas</li>
+                        <li>Todas las fotos subidas</li>
+                        <li>Comentarios y notificaciones</li>
+                        <li>Configuración de perfil</li>
+                        <li>Historial de actividad</li>
+                    </ul>
+                </div>
+                
+                <button type="button" class="btn btn-danger" onclick="confirmarEliminacionCuenta()">
+                    <span>🗑️</span>
+                    Eliminar mi cuenta
+                </button>
+            </div>
+        </div>
+        {% endif %}
     </div>
 </div>
+
+<!-- Modal de Confirmación -->
+<div id="confirmDeleteModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>⚠️ Confirmar eliminación de cuenta</h3>
+            <button type="button" class="modal-close" onclick="cerrarModalConfirmacion()">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="confirmation-warning">
+                <div class="warning-icon">🚨</div>
+                <h4>¡Esta acción es permanente!</h4>
+                <p>Estás a punto de eliminar tu cuenta de PawsToHome. Esta acción:</p>
+                <ul>
+                    <li><strong>NO se puede deshacer</strong></li>
+                    <li>Eliminará todos tus datos permanentemente</li>
+                    <li>Borrará todos tus reportes y fotos</li>
+                    <li>Cerrará tu sesión inmediatamente</li>
+                </ul>
+            </div>
+            
+            <div class="confirmation-input">
+                <label for="confirmText">Para confirmar, escribe <strong>"ELIMINAR"</strong> en el campo:</label>
+                <input type="text" id="confirmText" placeholder="Escribe ELIMINAR aquí" maxlength="8">
+                <small>Debe coincidir exactamente (sin comillas)</small>
+            </div>
+        </div>
+        
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="cerrarModalConfirmacion()">
+                Cancelar
+            </button>
+            <button type="button" id="confirmDeleteBtn" class="btn btn-danger" onclick="procederEliminacion()" disabled>
+                Eliminar cuenta definitivamente
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacionCuenta() {
+    document.getElementById('confirmDeleteModal').style.display = 'flex';
+    document.getElementById('confirmText').value = '';
+    document.getElementById('confirmDeleteBtn').disabled = true;
+}
+
+function cerrarModalConfirmacion() {
+    document.getElementById('confirmDeleteModal').style.display = 'none';
+}
+
+// Validar texto de confirmación
+document.getElementById('confirmText').addEventListener('input', function() {
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    const inputValue = this.value.trim();
+    
+    if (inputValue === 'ELIMINAR') {
+        confirmBtn.disabled = false;
+        confirmBtn.classList.add('enabled');
+    } else {
+        confirmBtn.disabled = true;
+        confirmBtn.classList.remove('enabled');
+    }
+});
+
+function procederEliminacion() {
+    // Mostrar mensaje de procesamiento
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<span>⏳</span> Eliminando cuenta...';
+    
+    // Crear y enviar formulario tradicional
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '{% url "ProfileService:delete_account" %}';
+    
+    // Token CSRF
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden';
+    csrfInput.name = 'csrfmiddlewaretoken';
+    csrfInput.value = '{{ csrf_token }}';
+    form.appendChild(csrfInput);
+    
+    // Confirmación
+    const confirmInput = document.createElement('input');
+    confirmInput.type = 'hidden';
+    confirmInput.name = 'confirm_deletion';
+    confirmInput.value = 'ELIMINAR';
+    form.appendChild(confirmInput);
+    
+    // Enviar formulario
+    document.body.appendChild(form);
+    form.submit();
+}
+
+// Cerrar modal al hacer clic fuera del contenido
+document.getElementById('confirmDeleteModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModalConfirmacion();
+    }
+});
+</script>
+
 {% endblock %}

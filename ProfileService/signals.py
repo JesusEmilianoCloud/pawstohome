@@ -95,14 +95,34 @@ def eliminar_foto_perfil_al_borrar_configuracion(sender, instance, **kwargs):
         eliminar_imagen_perfil_de_cloudflare_r2(instance.foto_perfil.name)
 
 @receiver(pre_delete, sender=settings.AUTH_USER_MODEL)
-def eliminar_foto_perfil_al_borrar_usuario(sender, instance, **kwargs):
+def limpiar_datos_usuario_completo(sender, instance, **kwargs):
     """
-    Signal para eliminar la foto de perfil de R2 cuando se elimina el usuario
+    Signal para eliminar todos los archivos de R2 cuando se elimina un usuario.
+    Esto incluye foto de perfil y fotos de reportes.
     """
+    from reportsservice.models import Reporte, FotoReporte
+    
     try:
+        # 1. Eliminar foto de perfil si existe
         if hasattr(instance, 'configuracion') and instance.configuracion.foto_perfil:
             eliminar_imagen_perfil_de_cloudflare_r2(instance.configuracion.foto_perfil.name)
-    except ConfiguracionUsuario.DoesNotExist:
-        pass
+            logger.info(f"Eliminada foto de perfil para usuario {instance.id}")
+        
+        # 2. Eliminar todas las fotos de reportes del usuario
+        reportes_usuario = Reporte.objects.filter(usuario=instance)
+        contador_fotos = 0
+        
+        for reporte in reportes_usuario:
+            fotos_reporte = FotoReporte.objects.filter(reporte=reporte)
+            for foto in fotos_reporte:
+                if foto.imagen and foto.imagen.name:
+                    # Reutilizar función de reportsservice para consistencia
+                    from reportsservice.signals import eliminar_imagen_de_cloudflare_r2
+                    eliminar_imagen_de_cloudflare_r2(foto.imagen.name)
+                    contador_fotos += 1
+        
+        logger.warning(f"Usuario {instance.id} eliminado - Limpieza completa: "
+                      f"foto perfil + {contador_fotos} fotos de reportes")
+                      
     except Exception as e:
-        logger.error(f"Error al eliminar foto de perfil para usuario {instance.id}: {str(e)}")
+        logger.error(f"Error en limpieza completa para usuario {instance.id}: {str(e)}")

@@ -6,6 +6,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 import json
 import os
 from .models import ConfiguracionUsuario
@@ -270,3 +271,63 @@ def user_reports_view(request, user_id):
     }
     
     return render(request, 'ProfileService/user_reports.html', context)
+
+@login_required
+def delete_account_view(request):
+    """
+    Vista para eliminar la cuenta del usuario actual.
+    Requiere confirmación explícita.
+    """
+    import logging
+    from django.contrib import messages
+    from django.contrib.auth import logout
+    
+    # Debug: Log la petición recibida
+    logger = logging.getLogger(__name__)
+    logger.info(f"DELETE ACCOUNT REQUEST: Método={request.method}, Usuario={request.user.id}")
+    
+    if request.method != 'POST':
+        messages.error(request, "Método no permitido.")
+        return redirect('ProfileService:profile', user_id=request.user.id)
+    
+    # Verificar confirmación
+    confirmation = request.POST.get('confirm_deletion', '').strip()
+    logger.info(f"DELETE ACCOUNT: Confirmación recibida='{confirmation}'")
+    
+    if confirmation != 'ELIMINAR':
+        messages.error(request, "Confirmación incorrecta. No se eliminó la cuenta.")
+        return redirect('ProfileService:profile', user_id=request.user.id)
+    
+    # Guardar información del usuario antes de eliminar
+    user = request.user
+    user_id = user.id
+    user_name = f"{user.first_name} {user.last_name}" or user.username
+    user_email = user.email
+    
+    logger.warning(f"INICIANDO ELIMINACIÓN: Usuario {user_id} ({user_name}) - {user_email}")
+    
+    try:
+        # Eliminar usuario (las señales CASCADE eliminan el resto)
+        logger.info(f"DELETE ACCOUNT: Eliminando usuario {user_id}")
+        user.delete()
+        logger.info(f"DELETE ACCOUNT: Usuario {user_id} eliminado exitosamente")
+        
+        # Cerrar sesión
+        logout(request)
+        logger.info(f"DELETE ACCOUNT: Sesión cerrada para usuario {user_id}")
+        
+        # Mensaje de éxito y redirección
+        messages.success(request, "Tu cuenta ha sido eliminada exitosamente. Esperamos verte de nuevo pronto.")
+        return redirect('Homeinfo:home')
+        
+    except Exception as e:
+        logger.error(f"ERROR eliminando cuenta usuario {user_id}: {type(e).__name__}: {str(e)}")
+        import traceback
+        logger.error(f"TRACEBACK: {traceback.format_exc()}")
+        
+        # Mensaje de error
+        messages.error(request, f"Error al eliminar cuenta. Por favor contacta al administrador.")
+        try:
+            return redirect('ProfileService:profile', user_id=user_id)
+        except:
+            return redirect('Homeinfo:home')
