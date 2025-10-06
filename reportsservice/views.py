@@ -289,3 +289,43 @@ def estado_cloudflare_r2(request):
     })
     
     return render(request, 'reportsservice/estado_r2.html', context)
+
+@login_required
+def eliminar_reporte(request, id):
+    """
+    Vista para eliminar un reporte y todas sus imágenes asociadas
+    Solo el propietario del reporte o staff puede eliminarlo
+    """
+    reporte = get_object_or_404(Reporte, id=id)
+    
+    # Verificar permisos
+    if request.user != reporte.usuario and not request.user.is_staff:
+        messages.error(request, "No tienes permisos para eliminar este reporte.")
+        return redirect('reportsservice:detalle_reporte', id=id)
+    
+    if request.method == 'POST':
+        try:
+            # Obtener información del reporte antes de eliminarlo
+            nombre_perro = reporte.nombre_perro
+            total_fotos = reporte.fotos.count()
+            
+            # Django eliminará automáticamente las FotoReporte asociadas debido al CASCADE
+            # Los signals se encargarán de eliminar las imágenes de Cloudflare R2
+            reporte.delete()
+            
+            messages.success(
+                request, 
+                f"El reporte de {nombre_perro} ha sido eliminado exitosamente junto con {total_fotos} imagen(es) asociada(s)."
+            )
+            return redirect('reportsservice:reportes')
+            
+        except Exception as e:
+            messages.error(request, f"Error al eliminar el reporte: {str(e)}")
+            return redirect('reportsservice:detalle_reporte', id=id)
+    
+    # GET request - mostrar confirmación
+    context = {
+        'reporte': reporte,
+    }
+    
+    return render(request, 'reportsservice/confirmar_eliminacion.html', context)

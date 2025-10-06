@@ -6,6 +6,7 @@ from django.core.files.storage import default_storage
 from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
 import json
 import os
 from .models import ConfiguracionUsuario
@@ -74,24 +75,14 @@ def edit_profile_view(request):
                         'configuracion': configuracion
                     })
                 
-                # Eliminar foto anterior si existe
-                if configuracion.foto_perfil:
-                    try:
-                        # Solo eliminar si estamos usando storage personalizado
-                        if hasattr(configuracion.foto_perfil, 'delete'):
-                            configuracion.foto_perfil.delete(save=False)
-                    except Exception as e:
-                        # Log el error pero continúa
-                        print(f"Error eliminando foto anterior: {e}")
-                
-                # Asignar nueva foto
+                # Asignar nueva foto (las señales se encargarán de eliminar la anterior de R2)
                 configuracion.foto_perfil = nueva_foto
             
             # Manejar eliminación de foto
             elif 'eliminar_foto' in request.POST:
                 if configuracion.foto_perfil:
                     try:
-                        configuracion.foto_perfil.delete(save=False)
+                        # Eliminar foto (las señales se encargarán de R2)
                         configuracion.foto_perfil = None
                     except Exception as e:
                         print(f"Error eliminando foto: {e}")
@@ -228,3 +219,115 @@ def obtener_direccion_desde_coordenadas_ajax(request):
         'success': False,
         'error': 'Método no permitido'
     })
+
+def user_reports_view(request, user_id):
+    """
+    Vista para mostrar todos los reportes de un usuario específico.
+    """
+    from reportsservice.models import Reporte
+    from django.core.paginator import Paginator
+    
+    # Obtener el usuario
+    profile_user = get_object_or_404(User, pk=user_id)
+    
+    # Obtener todos los reportes del usuario visibles
+    reportes = Reporte.objects.filter(
+        usuario=profile_user,
+        visible=True
+    ).select_related('raza').prefetch_related('fotos').order_by('-fecha_reporte')
+    
+    # Filtros opcionales
+    tipo_reporte = request.GET.get('tipo')
+    estado = request.GET.get('estado')
+    
+    if tipo_reporte:
+        reportes = reportes.filter(tipo_reporte=tipo_reporte)
+    
+    if estado:
+        reportes = reportes.filter(estado=estado)
+    
+    # Estadísticas del usuario
+    stats = {
+        'total': Reporte.objects.filter(usuario=profile_user, visible=True).count(),
+        'perdidos': Reporte.objects.filter(usuario=profile_user, tipo_reporte='perdido', visible=True).count(),
+        'encontrados': Reporte.objects.filter(usuario=profile_user, tipo_reporte='encontrado', visible=True).count(),
+        'activos': Reporte.objects.filter(usuario=profile_user, estado='activo', visible=True).count(),
+        'cerrados': Reporte.objects.filter(usuario=profile_user, estado='cerrado', visible=True).count(),
+    }
+    
+    # Paginación
+    paginator = Paginator(reportes, 12)  # 12 reportes por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {
+        'profile_user': profile_user,
+        'reportes': page_obj,
+        'stats': stats,
+        'is_paginated': page_obj.has_other_pages(),
+        'page_obj': page_obj,
+        'current_tipo': tipo_reporte,
+        'current_estado': estado,
+    }
+    
+    return render(request, 'ProfileService/user_reports.html', context)
+
+@login_required
+def delete_account_view(request):
+    """
+    Vista para eliminar la cuenta del usuario actual.
+    Requiere confirmación explícita.
+    """
+    import logging
+    from django.contrib import messages
+    from django.contrib.auth import logout
+    
+    # Debug: Log la petición recibida
+    logger = logging.getLogger(__name__)
+    logger.info(f"DELETE ACCOUNT REQUEST: Método={request.method}, Usuario={request.user.id}")
+    
+    if request.method != 'POST':
+        messages.error(request, "Método no permitido.")
+        return redirect('ProfileService:profile', user_id=request.user.id)
+    
+    # Verificar confirmación
+    confirmation = request.POST.get('confirm_deletion', '').strip()
+    logger.info(f"DELETE ACCOUNT: Confirmación recibida='{confirmation}'")
+    
+    if confirmation != 'ELIMINAR':
+        messages.error(request, "Confirmación incorrecta. No se eliminó la cuenta.")
+        return redirect('ProfileService:profile', user_id=request.user.id)
+    
+    # Guardar información del usuario antes de eliminar
+    user = request.user
+    user_id = user.id
+    user_name = f"{user.first_name} {user.last_name}" or user.username
+    user_email = user.email
+    
+    logger.warning(f"INICIANDO ELIMINACIÓN: Usuario {user_id} ({user_name}) - {user_email}")
+    
+    try:
+        # Eliminar usuario (las señales CASCADE eliminan el resto)
+        logger.info(f"DELETE ACCOUNT: Eliminando usuario {user_id}")
+        user.delete()
+        logger.info(f"DELETE ACCOUNT: Usuario {user_id} eliminado exitosamente")
+        
+        # Cerrar sesión
+        logout(request)
+        logger.info(f"DELETE ACCOUNT: Sesión cerrada para usuario {user_id}")
+        
+        # Mensaje de éxito y redirección
+        messages.success(request, "Tu cuenta ha sido eliminada exitosamente. Esperamos verte de nuevo pronto.")
+        return redirect('Homeinfo:home')
+        
+    except Exception as e:
+        logger.error(f"ERROR eliminando cuenta usuario {user_id}: {type(e).__name__}: {str(e)}")
+        import traceback
+        logger.error(f"TRACEBACK: {traceback.format_exc()}")
+        
+        # Mensaje de error
+        messages.error(request, f"Error al eliminar cuenta. Por favor contacta al administrador.")
+        try:
+            return redirect('ProfileService:profile', user_id=user_id)
+        except:
+            return redirect('Homeinfo:home')
