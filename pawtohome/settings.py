@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.facebook',
     'reportsservice',
     'Mapservice',
     'ProfileService',
@@ -177,6 +178,32 @@ AUTHENTICATION_BACKENDS = [
 SITE_ID = int(os.getenv("SITE_ID"))
 
 # Provider specific settings
+
+# Django Allauth social providers configuration
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email'
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online'
+        }
+    },
+    'facebook': {
+        'METHOD': 'oauth2',
+        'SCOPE': ['email', 'public_profile'],
+        'FIELDS': [
+            'id',
+            'email',
+            'name',
+            'first_name',
+            'last_name',
+            'picture'
+        ],
+    }
+}
+
 
 #Basic Config.
 LOGIN_URL = 'loginservice:login-register'
