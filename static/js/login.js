@@ -1,7 +1,10 @@
 /**
  * JavaScript específico para el login de PawsToHome
- * Maneja la funcionalidad de pestañas, validación y efectos visuales
+ * Maneja la funcionalidad de pestañas, validación, slides de registro y efectos visuales
  */
+
+let currentStep = 1;
+const totalSteps = 3;
 
 // Función para cambiar entre pestañas de login y registro
 function showTab(tabName) {
@@ -20,41 +23,137 @@ function showTab(tabName) {
         document.querySelectorAll('.tab-button')[0] : 
         document.querySelectorAll('.tab-button')[1];
     activeButton.classList.add('active');
+    
+    // Reset registration steps if switching to register
+    if (tabName === 'register') {
+        currentStep = 1;
+        showStep(1);
+    }
+}
+
+// Función para mostrar un paso específico del registro
+function showStep(step) {
+    // Ocultar todos los pasos
+    const steps = document.querySelectorAll('.form-step');
+    steps.forEach(stepEl => stepEl.classList.remove('active'));
+    
+    // Mostrar el paso actual
+    const currentStepEl = document.querySelector(`.form-step[data-step="${step}"]`);
+    if (currentStepEl) {
+        currentStepEl.classList.add('active');
+    }
+    
+    // Actualizar indicador de progreso
+    updateProgressIndicator(step);
+    
+    currentStep = step;
+}
+
+// Función para actualizar el indicador de progreso
+function updateProgressIndicator(step) {
+    const progressSteps = document.querySelectorAll('.progress-step');
+    progressSteps.forEach((progressStep, index) => {
+        if (index + 1 <= step) {
+            progressStep.classList.add('active');
+        } else {
+            progressStep.classList.remove('active');
+        }
+    });
+}
+
+// Función para ir al siguiente paso
+function nextStep() {
+    if (validateCurrentStep()) {
+        if (currentStep < totalSteps) {
+            showStep(currentStep + 1);
+        }
+    }
+}
+
+// Función para ir al paso anterior
+function prevStep() {
+    if (currentStep > 1) {
+        showStep(currentStep - 1);
+    }
+}
+
+// Función para validar el paso actual
+function validateCurrentStep() {
+    const currentStepEl = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+    if (!currentStepEl) return false;
+    
+    const requiredFields = currentStepEl.querySelectorAll('input[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+        clearFieldError(field);
+        
+        if (!field.value.trim()) {
+            showFieldError(field, 'Este campo es obligatorio');
+            isValid = false;
+        } else {
+            // Validaciones específicas por tipo y paso
+            if (currentStep === 2 && field.type === 'email' && !isValidEmail(field.value)) {
+                showFieldError(field, 'Ingrese un correo electrónico válido');
+                isValid = false;
+            } else if (currentStep === 3 && field.type === 'password' && field.value.length < 8) {
+                showFieldError(field, 'La contraseña debe tener al menos 8 caracteres');
+                isValid = false;
+            }
+        }
+    });
+    
+    // Validar confirmación de contraseña en el paso 3
+    if (currentStep === 3) {
+        const password = currentStepEl.querySelector('input[name="password"]');
+        const confirmPassword = currentStepEl.querySelector('input[name="confirm_password"]');
+        
+        if (password && confirmPassword && password.value !== confirmPassword.value) {
+            showFieldError(confirmPassword, 'Las contraseñas no coinciden');
+            isValid = false;
+        }
+    }
+    
+    return isValid;
 }
 
 // Configuración inicial cuando se carga el DOM
 document.addEventListener('DOMContentLoaded', function() {
-    // Verificar si hay errores de registro para mostrar esa pestaña
-    // Esta funcionalidad se manejará desde Django
-    
-    // Animar elementos de entrada
+    // Inicializar animaciones y efectos
     initializePageAnimations();
-    
-    // Configurar efectos de hover para campos de entrada
+    initializeHeroSlideshow();
     setupInputEffects();
-    
-    // Configurar validación de formularios
     setupFormValidation();
-    
-    // Configurar eventos de pestañas
     setupTabEvents();
+    
+    // Inicializar el primer paso del registro
+    showStep(1);
 });
 
 /**
  * Inicializa las animaciones de entrada de la página
  */
 function initializePageAnimations() {
-    const authMain = document.querySelector('.auth-main');
-    if (authMain) {
-        authMain.style.opacity = '0';
-        authMain.style.transform = 'translateY(30px)';
+    const authContainer = document.querySelector('.auth-container');
+    if (authContainer) {
+        authContainer.style.opacity = '0';
         
         setTimeout(() => {
-            authMain.style.transition = 'all 0.6s ease';
-            authMain.style.opacity = '1';
-            authMain.style.transform = 'translateY(0)';
+            authContainer.style.transition = 'opacity 0.6s ease';
+            authContainer.style.opacity = '1';
         }, 100);
     }
+}
+
+/**
+ * Inicializa efectos visuales adicionales
+ */
+function initializeHeroSlideshow() {
+    // Agregar efectos de animación a los badges de características
+    const featureBadges = document.querySelectorAll('.feature-badge');
+    featureBadges.forEach((badge, index) => {
+        badge.style.animationDelay = `${index * 0.2}s`;
+    });
 }
 
 /**
@@ -86,24 +185,41 @@ function setupFormValidation() {
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
         form.addEventListener('submit', function(e) {
-            const submitBtn = this.querySelector('.btn');
+            const formTypeInput = this.querySelector('input[name="form_type"]');
+            const isLogin = formTypeInput && formTypeInput.value === 'login';
+            
+            if (!isLogin) {
+                // Para registro, validar todos los pasos
+                let allStepsValid = true;
+                for (let step = 1; step <= totalSteps; step++) {
+                    const tempCurrentStep = currentStep;
+                    currentStep = step;
+                    if (!validateCurrentStep()) {
+                        allStepsValid = false;
+                        showStep(step); // Mostrar el primer paso con errores
+                        break;
+                    }
+                    currentStep = tempCurrentStep;
+                }
+                
+                if (!allStepsValid) {
+                    e.preventDefault();
+                    return false;
+                }
+            } else {
+                // Para login, validación simple
+                if (!validateForm(this)) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
                 // Efectos visuales durante el envío
                 submitBtn.style.opacity = '0.7';
-                
-                // Determinar el tipo de formulario
-                const formTypeInput = this.querySelector('input[name="form_type"]');
-                const isLogin = formTypeInput && formTypeInput.value === 'login';
-                const originalText = isLogin ? 'Iniciar Sesión' : 'Crear Cuenta';
-                
-                submitBtn.innerHTML = '<span>Procesando...</span>';
-                
-                // Validación básica antes del envío
-                if (!validateForm(this)) {
-                    e.preventDefault();
-                    restoreButton(submitBtn, originalText);
-                    return false;
-                }
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Procesando...';
                 
                 // Restaurar botón después de un tiempo si hay error
                 setTimeout(() => {
@@ -174,17 +290,17 @@ function showFieldError(field, message) {
             errorElement = document.createElement('div');
             errorElement.className = 'field-error';
             errorElement.style.cssText = `
-                color: #e53e3e;
-                font-size: 0.875rem;
-                margin-top: 0.5rem;
-                font-family: 'Inter', sans-serif;
+                color: #F56565;
+                font-size: 12px;
+                margin-top: 4px;
+                font-weight: 500;
             `;
             formGroup.appendChild(errorElement);
         }
         
         errorElement.textContent = message;
-        field.style.borderColor = '#e53e3e';
-        field.style.boxShadow = '0 0 0 4px rgba(229, 62, 62, 0.1)';
+        field.style.borderColor = '#F56565';
+        field.style.boxShadow = '0 0 0 3px rgba(245, 101, 101, 0.1)';
     }
 }
 
@@ -297,6 +413,10 @@ notificationStyles.textContent = `
             opacity: 0;
             transform: translateX(300px);
         }
+    }
+    
+    .field-error {
+        animation: fadeInUp 0.3s ease;
     }
 `;
 document.head.appendChild(notificationStyles);
