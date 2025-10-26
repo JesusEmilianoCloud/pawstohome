@@ -594,17 +594,33 @@
 
 .btn-secondary {
     background: transparent;
-    color: #e53e3e;
-    border: 2px solid #e53e3e;
-    box-shadow: 0 2px 8px rgba(229, 62, 62, 0.1);
+    color: #718096;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
 }
 
 .btn-secondary:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+    color: #2d3748;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+}
+
+/* Estilo específico para botón de logout */
+.btn-secondary.logout-btn {
+    color: #e53e3e;
+    border-color: #fed7d7;
+    background: rgba(254, 215, 215, 0.1);
+}
+
+.btn-secondary.logout-btn:hover {
     background: #e53e3e;
     color: white;
-    transform: translateY(-2px);
+    border-color: #e53e3e;
     box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
-    text-decoration: none;
 }
 
 .btn-outline {
