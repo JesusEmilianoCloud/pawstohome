@@ -444,7 +444,7 @@ body {
 }
 
 /* Messages */
-.error-message, .success-message {
+.error-message, .success-message, .alert {
     padding: 16px;
     border-radius: 8px;
     margin-bottom: 1rem;
@@ -453,16 +453,28 @@ body {
     animation: slideInDown 0.3s ease;
 }
 
-.error-message {
+.error-message, .alert-error, .alert-danger {
     background-color: rgba(245, 101, 101, 0.1);
     color: var(--error-color);
     border-left-color: var(--error-color);
 }
 
-.success-message {
+.success-message, .alert-success {
     background-color: rgba(72, 187, 120, 0.1);
     color: var(--success-color);
     border-left-color: var(--success-color);
+}
+
+.alert-warning {
+    background-color: rgba(246, 173, 85, 0.1);
+    color: var(--secondary-orange);
+    border-left-color: var(--secondary-orange);
+}
+
+.alert-info {
+    background-color: rgba(99, 179, 237, 0.1);
+    color: #3182CE;
+    border-left-color: #3182CE;
 }
 
 @keyframes slideInDown {
