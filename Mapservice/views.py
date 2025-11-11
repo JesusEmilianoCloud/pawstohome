@@ -6,6 +6,9 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 import json
 
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def mapa_interactivo(request):
     """Vista para el mapa interactivo de reportes"""
     # Obtener todas las razas para el filtro

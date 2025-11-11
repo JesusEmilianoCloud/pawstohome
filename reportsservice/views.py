@@ -9,6 +9,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from .models import Reporte, Raza, FotoReporte, Comentario
 from .utils import CloudflareR2ImageUploader, upload_foto_reporte_to_r2
 
+@login_required
 def lista_reportes(request):
     """
     Vista para mostrar la lista de reportes con filtros y paginación
