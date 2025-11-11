@@ -20,7 +20,7 @@
     max-width: 900px;
     margin: 2rem auto;
     padding: 2rem 1rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        background: none;
     min-height: calc(100vh - 160px);
 }
 
