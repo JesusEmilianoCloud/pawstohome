@@ -1,6 +1,7 @@
 // Reportes JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     initializeReports();
+    initFilterFormValidation();
 });
 
 function initializeReports() {
@@ -195,6 +196,23 @@ function showNotification(message, type = 'info') {
 // Manejo de formularios de filtros
 document.addEventListener('submit', function(e) {
     if (e.target.classList.contains('filters-form')) {
+        let valid = true;
+        const requiredFields = e.target.querySelectorAll('[required]');
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                showFieldError(field, 'Este campo es obligatorio');
+                field.style.borderColor = '#dc3545';
+                valid = false;
+            } else {
+                clearFieldError(field);
+                field.style.borderColor = '#28a745';
+            }
+        });
+        if (!valid) {
+            e.preventDefault();
+            showNotification('Por favor, completa todos los campos requeridos', 'error');
+            return;
+        }
         // Mostrar loading en el botón de aplicar filtros
         const submitBtn = e.target.querySelector('button[type="submit"]');
         if (submitBtn) {
@@ -203,6 +221,43 @@ document.addEventListener('submit', function(e) {
         }
     }
 });
+
+function showFieldError(field, message) {
+    clearFieldError(field);
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message';
+    errorDiv.style.color = '#dc3545';
+    errorDiv.style.fontSize = '0.95rem';
+    errorDiv.style.marginTop = '0.25rem';
+    errorDiv.textContent = message;
+    field.parentNode.appendChild(errorDiv);
+}
+
+function clearFieldError(field) {
+    const errorDiv = field.parentNode.querySelector('.error-message');
+    if (errorDiv) {
+        errorDiv.remove();
+    }
+    field.style.borderColor = '';
+}
+
+function initFilterFormValidation() {
+    const filterForms = document.querySelectorAll('.filters-form');
+    filterForms.forEach(form => {
+        const requiredFields = form.querySelectorAll('[required]');
+        requiredFields.forEach(field => {
+            field.addEventListener('input', function() {
+                if (!this.value.trim()) {
+                    showFieldError(this, 'Este campo es obligatorio');
+                    this.style.borderColor = '#dc3545';
+                } else {
+                    clearFieldError(this);
+                    this.style.borderColor = '#28a745';
+                }
+            });
+        });
+    });
+}
 
 // Manejo de enlaces de paginación
 document.addEventListener('click', function(e) {
