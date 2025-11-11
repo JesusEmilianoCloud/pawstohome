@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseForbidden
 from django.utils import timezone
 from django.contrib.admin.views.decorators import staff_member_required
 from .models import Reporte, Raza, FotoReporte, Comentario
@@ -329,3 +329,65 @@ def eliminar_reporte(request, id):
     }
     
     return render(request, 'reportsservice/confirmar_eliminacion.html', context)
+
+@login_required
+def editar_reporte(request, id):
+    """
+    Vista para editar un reporte existente
+    Solo el creador del reporte puede editarlo
+    """
+    reporte = get_object_or_404(Reporte, id=id, visible=True)
+    if reporte.usuario != request.user:
+        return HttpResponseForbidden("Solo el creador puede editar este reporte.")
+
+    razas = Raza.objects.all().order_by('nombre')
+
+    if request.method == 'POST':
+        # Validar y actualizar campos
+        reporte.nombre_perro = request.POST.get('nombre_perro', reporte.nombre_perro)
+        reporte.color = request.POST.get('color', reporte.color)
+        reporte.tamano = request.POST.get('tamano', reporte.tamano)
+        reporte.descripcion = request.POST.get('descripcion', reporte.descripcion)
+        reporte.caracteristicas_distintivas = request.POST.get('caracteristicas_distintivas', reporte.caracteristicas_distintivas)
+        reporte.latitud = request.POST.get('latitud', reporte.latitud)
+        reporte.longitud = request.POST.get('longitud', reporte.longitud)
+        reporte.direccion = request.POST.get('direccion', reporte.direccion)
+        reporte.zona = request.POST.get('zona', reporte.zona)
+        reporte.fecha_incidente = request.POST.get('fecha_incidente', reporte.fecha_incidente)
+        reporte.telefono_contacto = request.POST.get('telefono_contacto', reporte.telefono_contacto)
+        reporte.email_contacto = request.POST.get('email_contacto', reporte.email_contacto)
+        raza_id = request.POST.get('raza')
+        if raza_id:
+            try:
+                reporte.raza = Raza.objects.get(id=raza_id)
+            except Raza.DoesNotExist:
+                pass
+        reporte.save()
+        # Manejo de fotos nuevas (solo una secundaria permitida)
+        fotos = request.FILES.getlist('fotos')
+        if fotos:
+            # Elimina la foto secundaria existente (es_principal=False) si hay una
+            foto_secundaria = reporte.fotos.filter(es_principal=False).first()
+            if foto_secundaria:
+                foto_secundaria.delete()
+            # Solo guarda la primera foto subida como secundaria
+            foto = fotos[0]
+            foto_reporte = FotoReporte(
+                reporte=reporte,
+                imagen=foto,
+                es_principal=False,
+                orden=reporte.fotos.count()
+            )
+            foto_reporte.save()
+        # Manejo de eliminación de fotos
+        for foto in reporte.fotos.all():
+            if request.POST.get(f'eliminar_foto_{foto.id}'):
+                foto.delete()
+        messages.success(request, 'Reporte actualizado correctamente.')
+        return redirect('reportsservice:detalle_reporte', id=reporte.id)
+
+    context = {
+        'reporte': reporte,
+        'razas': razas,
+    }
+    return render(request, 'reportsservice/editar_reporte.html', context)
