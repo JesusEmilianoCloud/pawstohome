@@ -53,8 +53,13 @@
                     <p class="form-subtitle">Ingresa a tu cuenta para continuar</p>
                 </div>
                 
-                {% if login_error %}
-                    <div class="error-message">{{ login_error }}</div>
+                <!-- Mensajes de Django -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
                 
                 <form method="post" action="{% url 'loginservice:login-register' %}">
@@ -62,13 +67,13 @@
                     <input type="hidden" name="form_type" value="login">
                     
                     <div class="form-group">
-                        <label for="login_username">Correo Electrónico</label>
-                        <input type="text" id="login_username" name="username" class="form-control" placeholder="correo@ejemplo.com" required>
+                        <label for="login_username">Usuario o Correo</label>
+                        <input type="text" id="login_username" name="username" class="form-control" placeholder="usuario@ejemplo.com" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="login_password">Correo Electrónico</label>
-                        <input type="password" id="login_password" name="password" class="form-control" placeholder="correo@ejemplo.com" required>
+                        <label for="login_password">Contraseña</label>
+                        <input type="password" id="login_password" name="password" class="form-control" placeholder="Tu contraseña" required>
                     </div>
                     
                     <div class="form-group checkbox-group">
@@ -116,12 +121,13 @@
                     <p class="form-subtitle">Únete a nuestra comunidad</p>
                 </div>
                 
-                {% if register_error %}
-                    <div class="error-message">{{ register_error }}</div>
-                {% endif %}
-                
-                {% if register_success %}
-                    <div class="success-message">{{ register_success }}</div>
+                <!-- Mensajes de Django para registro -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endif %}
                 
                 <!-- Progress Indicator -->
@@ -243,11 +249,18 @@
 {% block extra_js %}
 <script src="{% static 'js/login.js' %}"></script>
 <script>
-    // Verificar si hay errores de registro para mostrar esa pestaña
-    {% if register_error or register_success %}
-        document.addEventListener('DOMContentLoaded', function() {
-            showTab('register');
-        });
-    {% endif %}
+    // Verificar si hay mensajes para determinar qué pestaña mostrar
+    document.addEventListener('DOMContentLoaded', function() {
+        {% if messages %}
+            {% for message in messages %}
+                // Si el mensaje contiene palabras relacionadas con registro, mostrar pestaña de registro
+                var messageText = "{{ message }}".toLowerCase();
+                if (messageText.includes('registrado') || messageText.includes('email ya está') || 
+                    messageText.includes('usuario ya está') || messageText.includes('contraseñas no coinciden')) {
+                    showTab('register');
+                }
+            {% endfor %}
+        {% endif %}
+    });
 </script>
 {% endblock %}
