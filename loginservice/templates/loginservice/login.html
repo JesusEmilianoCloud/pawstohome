@@ -9,220 +9,230 @@
 
 {% block content %}
 <div class="auth-container">
-    <!-- Decoraciones de fondo -->
-    <div class="bg-decoration paw-bg-1">🐾</div>
-    <div class="bg-decoration paw-bg-2">🐾</div>
-    <div class="bg-decoration paw-bg-3">🐾</div>
-
-    <div class="auth-main">
-        <!-- Lado izquierdo - Branding -->
-        <div class="auth-brand bg-gradient-orange">
-            <div class="brand-content">
-                <div class="brand-logo">
+    <!-- Hero Image Section -->
+    <div class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <div class="hero-text">
+                <div class="brand-logo-hero">
                     <img src="{% static 'images/PawsToHome.png' %}" alt="PawsToHome Logo">
                 </div>
-                <h1 class="brand-title">PawsToHome</h1>
-                <p class="brand-subtitle">Reuniendo familias en Ciudad Juárez</p>
-                
-                <div class="features-list">
-                    <div class="feature-item">
-                        <div class="feature-check">✓</div>
-                        <span>Reporta mascotas perdidas al instante</span>
+                <h1 class="hero-title">PawsToHome</h1>
+                <p class="hero-subtitle">Reuniendo familias en Ciudad Juárez</p>
+                <div class="hero-features">
+                    <div class="feature-badge">
+                        <span class="feature-icon">🐕</span>
+                        <span>Mascotas perdidas</span>
                     </div>
-                    <div class="feature-item">
-                        <div class="feature-check">✓</div>
-                        <span>Mapa interactivo en tiempo real</span>
+                    <div class="feature-badge">
+                        <span class="feature-icon">📍</span>
+                        <span>Mapa en tiempo real</span>
                     </div>
-                    <div class="feature-item">
-                        <div class="feature-check">✓</div>
-                        <span>Notificaciones automáticas</span>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-check">✓</div>
-                        <span>Comunidad de apoyo local</span>
+                    <div class="feature-badge">
+                        <span class="feature-icon">🏠</span>
+                        <span>Reunir familias</span>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Lado derecho - Formularios -->
-        <div class="auth-forms">
-            <div class="form-container">
-                <!-- Switcher de pestañas -->
-                <div class="auth-tabs">
-                    <button class="tab-button active" onclick="showTab('login')">Iniciar Sesión</button>
-                    <button class="tab-button" onclick="showTab('register')">Registrarse</button>
+    <!-- Auth Forms Section -->
+    <div class="auth-forms-section">
+        <div class="form-container">
+            <!-- Switcher de pestañas -->
+            <div class="auth-tabs">
+                <button class="tab-button active" onclick="showTab('login')">Iniciar de sesión</button>
+                <button class="tab-button" onclick="showTab('register')">Registro</button>
+            </div>
+
+            <!-- Formulario de Login -->
+            <div id="login" class="form-content active">
+                <div class="form-header">
+                    <h2 class="form-title">¡Bienvenido de vuelta!</h2>
+                    <p class="form-subtitle">Ingresa a tu cuenta para continuar</p>
+                </div>
+                
+                {% if login_error %}
+                    <div class="error-message">{{ login_error }}</div>
+                {% endif %}
+                
+                <form method="post" action="{% url 'loginservice:login-register' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="login">
+                    
+                    <div class="form-group">
+                        <label for="login_username">Correo Electrónico</label>
+                        <input type="text" id="login_username" name="username" class="form-control" placeholder="correo@ejemplo.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login_password">Correo Electrónico</label>
+                        <input type="password" id="login_password" name="password" class="form-control" placeholder="correo@ejemplo.com" required>
+                    </div>
+                    
+                    <div class="form-group checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="remember" class="checkbox-input">
+                            <span class="checkmark"></span>
+                            Recordarme
+                        </label>
+                        <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                </form>
+                
+                <div class="divider">
+                    <div class="divider-line"></div>
+                    <span class="divider-text">O continúa con</span>
+                    <div class="divider-line"></div>
                 </div>
 
-                <!-- Formulario de Login -->
-                <div id="login" class="form-content active">
-                    <div class="form-header">
-                        <h2 class="form-title">¡Bienvenido de vuelta!</h2>
-                        <p class="form-subtitle">Ingresa a tu cuenta para continuar</p>
-                    </div>
-                    
-                    {% if login_error %}
-                        <div class="error-message">{{ login_error }}</div>
-                    {% endif %}
-                    
-                    <form method="post" action="{% url 'loginservice:login-register' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="form_type" value="login">
-                        
-                        <div class="form-group">
-                            <label for="login_username">Nombre de usuario</label>
-                            <div class="input-with-icon">
-                                <span class="input-icon">👤</span>
-                                <input type="text" id="login_username" name="username" class="form-control with-icon" placeholder="Ingresa tu usuario" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="login_password">Contraseña</label>
-                            <div class="input-with-icon">
-                                <span class="input-icon">🔐</span>
-                                <input type="password" id="login_password" name="password" class="form-control with-icon" placeholder="••••••••" required>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-                    </form>
-                    
-                    <div class="form-link">
-                        <a href="#" onclick="showTab('register')">¿No tienes cuenta? Regístrate aquí</a>
-                    </div>
+                {% load socialaccount %}
+                <div class="social-buttons">
+                    <a class="social-btn google-btn" href="{% provider_login_url 'google' %}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        Google
+                    </a>
+                    <a class="social-btn facebook-btn" href="{% provider_login_url 'facebook' %}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                        Facebook
+                    </a>
+                </div>
+            </div>
 
-                    <div class="divider">
-                        <div class="divider-line"></div>
-                        <span class="divider-text">O continúa con</span>
-                        <div class="divider-line"></div>
+            <!-- Formulario de Registro con slides -->
+            <div id="register" class="form-content">
+                <div class="form-header">
+                    <h2 class="form-title">Crea tu cuenta</h2>
+                    <p class="form-subtitle">Únete a nuestra comunidad</p>
+                </div>
+                
+                {% if register_error %}
+                    <div class="error-message">{{ register_error }}</div>
+                {% endif %}
+                
+                {% if register_success %}
+                    <div class="success-message">{{ register_success }}</div>
+                {% endif %}
+                
+                <!-- Progress Indicator -->
+                <div class="progress-indicator">
+                    <div class="progress-step active" data-step="1">
+                        <div class="step-circle">1</div>
+                        <span class="step-label">Información Personal</span>
                     </div>
-
-                    {% load socialaccount %}
-                    <div class="social-buttons">
-                        <button class="social-btn" type="button">
-                            <a class="social-btn" href="{% provider_login_url 'google' %}">
-                                <span>
-                                    <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-google"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20.945 11a9 9 0 1 1 -3.284 -5.997l-2.655 2.392a5.5 5.5 0 1 0 2.119 6.605h-4.125v-3h7.945z" />
-                                    </svg>
-                                </span>
-                                <span>Google</span>
-                            </a>
-                        </button>
-                        <button class="social-btn" type="button">
-                            <span>
-                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-facebook"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" />
-                                </svg>
-                            </span>
-                            <span>Facebook</span>
-                        </button>
+                    <div class="progress-step" data-step="2">
+                        <div class="step-circle">2</div>
+                        <span class="step-label">Contacto</span>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="step-circle">3</div>
+                        <span class="step-label">Seguridad</span>
                     </div>
                 </div>
-
-                <!-- Formulario de Registro -->
-                <div id="register" class="form-content">
-                    <div class="form-header">
-                        <h2 class="form-title">Crea tu cuenta</h2>
-                        <p class="form-subtitle">Únete a nuestra comunidad</p>
-                    </div>
+                
+                <form method="post" action="{% url 'loginservice:login-register' %}" id="registerForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="register">
                     
-                    {% if register_error %}
-                        <div class="error-message">{{ register_error }}</div>
-                    {% endif %}
-                    
-                    {% if register_success %}
-                        <div class="success-message">{{ register_success }}</div>
-                    {% endif %}
-                    
-                    <form method="post" action="{% url 'loginservice:login-register' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="form_type" value="register">
-                        
+                    <!-- Step 1: Personal Information -->
+                    <div class="form-step active" data-step="1">
                         <div class="form-group">
-                            <label for="register_first_name">Nombre</label>
-                            <div class="input-with-icon">
-                                <span class="input-icon">👤</span>
-                                <input type="text" id="register_first_name" name="first_name" class="form-control with-icon" placeholder="Tu nombre" required>
-                            </div>
+                            <label for="register_first_name">Nombre Completo</label>
+                            <input type="text" id="register_first_name" name="first_name" class="form-control" placeholder="Ej. Juan Ramirez" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="register_last_name">Apellido</label>
-                            <div class="input-with-icon">
-                                <span class="input-icon">👤</span>
-                                <input type="text" id="register_last_name" name="last_name" class="form-control with-icon" placeholder="Tu apellido" required>
-                            </div>
+                            <input type="text" id="register_last_name" name="last_name" class="form-control" placeholder="Tu apellido" required>
                         </div>
                         
+                        <div class="step-navigation">
+                            <button type="button" class="btn btn-next" onclick="nextStep()">Siguiente</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Contact Information -->
+                    <div class="form-step" data-step="2">
                         <div class="form-group">
                             <label for="register_email">Correo Electrónico</label>
-                            <div class="input-with-icon">
-                                <span class="input-icon">📧</span>
-                                <input type="email" id="register_email" name="email" class="form-control with-icon" placeholder="tu@correo.com" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="register_username">Nombre de usuario</label>
-                            <div class="input-with-icon">
-                                <span class="input-icon">👤</span>
-                                <input type="text" id="register_username" name="username" class="form-control with-icon" placeholder="Elige un nombre de usuario" required>
-                            </div>
+                            <input type="email" id="register_email" name="email" class="form-control" placeholder="correo@ejemplo.com" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="register_phone_number">Teléfono</label>
-                            <div class="input-with-icon">
-                                <span class="input-icon">📱</span>
-                                <input type="tel" id="register_phone_number" name="phone_number" class="form-control with-icon" placeholder="Tu número de teléfono" required>
-                            </div>
+                            <input type="tel" id="register_phone_number" name="phone_number" class="form-control" placeholder="656-XXXX-XXX" required>
+                        </div>
+                        
+                        <div class="step-navigation">
+                            <button type="button" class="btn btn-prev" onclick="prevStep()">Anterior</button>
+                            <button type="button" class="btn btn-next" onclick="nextStep()">Siguiente</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Security -->
+                    <div class="form-step" data-step="3">
+                        <div class="form-group">
+                            <label for="register_username">Nombre de usuario</label>
+                            <input type="text" id="register_username" name="username" class="form-control" placeholder="Elige un nombre de usuario" required>
                         </div>
                         
                         <div class="form-group">
                             <label for="register_password">Contraseña</label>
-                            <div class="input-with-icon">
-                                <span class="input-icon">🔐</span>
-                                <input type="password" id="register_password" name="password" class="form-control with-icon" placeholder="Mínimo 8 caracteres" required>
-                            </div>
+                            <input type="password" id="register_password" name="password" class="form-control" placeholder="Contraseña" required>
                         </div>
                         
                         <div class="form-group">
-                            <label for="register_confirm_password">Confirmar contraseña</label>
-                            <div class="input-with-icon">
-                                <span class="input-icon">🔐</span>
-                                <input type="password" id="register_confirm_password" name="confirm_password" class="form-control with-icon" placeholder="Repite tu contraseña" required>
-                            </div>
+                            <label for="register_confirm_password">Confirmar Contraseña</label>
+                            <input type="password" id="register_confirm_password" name="confirm_password" class="form-control" placeholder="Confirmar contraseña" required>
                         </div>
                         
-                        <button type="submit" class="btn btn-secondary">Crear Cuenta</button>
-                    </form>
-                    
-                    <div class="form-link">
-                        <a href="#" onclick="showTab('login')">¿Ya tienes cuenta? Inicia sesión</a>
+                        <div class="form-group checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="accept_terms" class="checkbox-input" required>
+                                <span class="checkmark"></span>
+                                Acepto los <a href="#" class="terms-link">Términos y Condiciones</a> y la <a href="#" class="terms-link">Política de Privacidad</a>
+                            </label>
+                        </div>
+                        
+                        <div class="step-navigation">
+                            <button type="button" class="btn btn-prev" onclick="prevStep()">Anterior</button>
+                            <button type="submit" class="btn btn-primary">Crear Cuenta</button>
+                        </div>
                     </div>
+                </form>
+                
+                <div class="divider" style="margin-top: 2rem;">
+                    <div class="divider-line"></div>
+                    <span class="divider-text">O regístrate con</span>
+                    <div class="divider-line"></div>
+                </div>
 
-                    <div class="divider">
-                        <div class="divider-line"></div>
-                        <span class="divider-text">O regístrate con</span>
-                        <div class="divider-line"></div>
-                    </div>
-
-                    <div class="social-buttons">
-                        <button class="social-btn" type="button">
-                            <span>
-                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-google"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M20.945 11a9 9 0 1 1 -3.284 -5.997l-2.655 2.392a5.5 5.5 0 1 0 2.119 6.605h-4.125v-3h7.945z" />
-                                </svg>
-                            </span>
-                            <span>Google</span>
-                        </button>
-                        <button class="social-btn" type="button">
-                            <span>
-                                <svg  xmlns="http://www.w3.org/2000/svg"  width="24"  height="24"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  class="icon icon-tabler icons-tabler-outline icon-tabler-brand-facebook"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 10v4h3v7h4v-7h3l1 -4h-4v-2a1 1 0 0 1 1 -1h3v-4h-3a5 5 0 0 0 -5 5v2h-3" />
-                                </svg>
-                            </span>
-                            <span>Facebook</span>
-                        </button>
-                    </div>
+                <div class="social-buttons">
+                    <a class="social-btn google-btn" href="{% provider_login_url 'google' %}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                        </svg>
+                        Google
+                    </a>
+                    <a class="social-btn facebook-btn" href="{% provider_login_url 'facebook' %}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="#1877F2">
+                            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                        </svg>
+                        Facebook
+                    </a>
                 </div>
             </div>
         </div>

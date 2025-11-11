@@ -23,9 +23,9 @@ class MapaInteractivo {
         });
         
         this.filtrosActivos = {
-            tipo: 'todos',
+            tipo: '',  // Cambiado de 'todos' a '' para que coincida con el data-type
             raza: '',
-            radio: 50,
+            radio: 10,  // Cambiado de 50 a 10 (valor inicial del slider)
             fechaDesde: '',
             fechaHasta: '',
             busqueda: ''
@@ -106,8 +106,10 @@ class MapaInteractivo {
                 // Agregar clase active al botón clickeado
                 e.target.classList.add('active');
                 
-                // Actualizar filtro
-                this.filtrosActivos.tipo = e.target.dataset.tipo;
+                // Actualizar filtro - el data-type puede ser '', 'perdido' o 'encontrado'
+                const tipoSeleccionado = e.target.dataset.type || '';
+                this.filtrosActivos.tipo = tipoSeleccionado;
+                
                 this.aplicarFiltros();
             });
         });
@@ -184,14 +186,25 @@ class MapaInteractivo {
                 }
                 e.target.classList.add('active');
                 
-                const dias = parseInt(e.target.dataset.dias);
-                if (dias) {
-                    const hoy = new Date();
-                    const desde = new Date(hoy.getTime() - (dias * 24 * 60 * 60 * 1000));
-                    
+                const period = e.target.dataset.period;
+                const hoy = new Date();
+                
+                if (period === 'today') {
+                    // Hoy
+                    this.filtrosActivos.fechaDesde = hoy.toISOString().split('T')[0];
+                    this.filtrosActivos.fechaHasta = hoy.toISOString().split('T')[0];
+                } else if (period === 'week') {
+                    // Esta semana (últimos 7 días)
+                    const desde = new Date(hoy.getTime() - (7 * 24 * 60 * 60 * 1000));
+                    this.filtrosActivos.fechaDesde = desde.toISOString().split('T')[0];
+                    this.filtrosActivos.fechaHasta = hoy.toISOString().split('T')[0];
+                } else if (period === 'month') {
+                    // Este mes (últimos 30 días)
+                    const desde = new Date(hoy.getTime() - (30 * 24 * 60 * 60 * 1000));
                     this.filtrosActivos.fechaDesde = desde.toISOString().split('T')[0];
                     this.filtrosActivos.fechaHasta = hoy.toISOString().split('T')[0];
                 } else {
+                    // Todos (limpiar filtros de fecha)
                     this.filtrosActivos.fechaDesde = '';
                     this.filtrosActivos.fechaHasta = '';
                 }
@@ -245,22 +258,19 @@ class MapaInteractivo {
     
     async cargarReportes() {
         try {
-            console.log('Cargando reportes desde la API...');
             const response = await fetch('/maps/api/reportes/');
             
             if (!response.ok) {
-                console.error('Respuesta no OK:', response.status, response.statusText);
                 throw new Error(`Error ${response.status}: ${response.statusText}`);
             }
             
             const data = await response.json();
-            console.log('Reportes cargados:', data);
             
             this.reportesData = data.reportes || [];
             this.mostrarReportesEnMapa();
             this.actualizarListaReportesCercanos();
         } catch (error) {
-            console.error('Error detallado:', error);
+            console.error('Error al cargar reportes:', error);
             this.mostrarError(`Error al cargar los reportes: ${error.message}`);
         }
     }
@@ -283,20 +293,24 @@ class MapaInteractivo {
     filtrarReportes() {
         let reportesFiltrados = [...this.reportesData];
         
-        // Filtro por tipo
-        if (this.filtrosActivos.tipo !== 'todos') {
+        // Filtro por tipo (perdido/encontrado/todos)
+        if (this.filtrosActivos.tipo && this.filtrosActivos.tipo.trim() !== '') {
             reportesFiltrados = reportesFiltrados.filter(r => r.tipo_reporte === this.filtrosActivos.tipo);
         }
         
         // Filtro por raza
         if (this.filtrosActivos.raza) {
-            reportesFiltrados = reportesFiltrados.filter(r => 
-                r.raza && r.raza.toLowerCase().includes(this.filtrosActivos.raza.toLowerCase())
-            );
+            reportesFiltrados = reportesFiltrados.filter(r => {
+                // Comparar por ID si es un número, sino por nombre
+                if (!isNaN(this.filtrosActivos.raza)) {
+                    return r.raza_id == this.filtrosActivos.raza;
+                }
+                return r.raza && r.raza.toLowerCase().includes(this.filtrosActivos.raza.toLowerCase());
+            });
         }
         
-        // Filtro por radio (si hay posición del usuario)
-        if (this.posicionUsuario && this.filtrosActivos.radio < 200) {
+        // Filtro por radio (solo si hay posición del usuario)
+        if (this.posicionUsuario) {
             reportesFiltrados = reportesFiltrados.filter(r => {
                 if (!r.latitud || !r.longitud) return false;
                 const distancia = this.calcularDistancia(
@@ -332,7 +346,8 @@ class MapaInteractivo {
             reportesFiltrados = reportesFiltrados.filter(r => 
                 (r.nombre_perro && r.nombre_perro.toLowerCase().includes(termino)) ||
                 (r.raza && r.raza.toLowerCase().includes(termino)) ||
-                (r.descripcion && r.descripcion.toLowerCase().includes(termino))
+                (r.descripcion && r.descripcion.toLowerCase().includes(termino)) ||
+                (r.zona && r.zona.toLowerCase().includes(termino))
             );
         }
         

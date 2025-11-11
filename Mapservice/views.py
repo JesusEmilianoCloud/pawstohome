@@ -113,6 +113,7 @@ def api_reportes_mapa(request):
             'tipo_reporte': reporte.tipo_reporte,
             'nombre_perro': reporte.nombre_perro,
             'raza': reporte.raza.nombre if reporte.raza else 'Mestizo',
+            'raza_id': reporte.raza.id if reporte.raza else None,  # Agregar ID de la raza
             'color': reporte.color,
             'tamano': reporte.get_tamano_display(),
             'descripcion': reporte.descripcion[:200] + '...' if len(reporte.descripcion) > 200 else reporte.descripcion,
