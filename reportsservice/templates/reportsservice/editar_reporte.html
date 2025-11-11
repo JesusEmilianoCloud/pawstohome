@@ -1,0 +1,203 @@
+{% extends 'Homeinfo/base_simple.html' %}
+{% load static %}
+
+{% block title %}Editar Reporte - PawsToHome{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/crear_reporte.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="create-report-container">
+    <div class="form-header">
+        <h1 class="form-title">✏️ Editar Reporte</h1>
+        <p class="form-subtitle">Solo el creador del reporte puede modificar la información</p>
+    </div>
+
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <span class="message-icon">
+                        {% if message.tags == 'success' %}✅{% elif message.tags == 'error' %}❌{% elif message.tags == 'warning' %}⚠️{% else %}ℹ️{% endif %}
+                    </span>
+                    {{ message }}
+                    <button type="button" class="close-message" onclick="this.parentElement.remove()">×</button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" class="report-form" id="edit-report-form">
+        {% csrf_token %}
+        <!-- Paso 1: Tipo de Reporte -->
+        <div class="form-step active" data-step="1">
+            <div class="step-header">
+                <h2 class="step-title">
+                    <span class="step-number">1</span>
+                    Tipo de Reporte
+                </h2>
+                <p class="step-description">No se puede cambiar el tipo de reporte</p>
+            </div>
+            <div class="report-type-selection">
+                <div class="report-type-card {% if reporte.tipo_reporte == 'perdido' %}selected{% endif %}" data-type="perdido">
+                    <div class="type-icon">🔍</div>
+                    <h3>Mascota Perdida</h3>
+                    <input type="radio" name="tipo_reporte" value="perdido" id="tipo_perdido" {% if reporte.tipo_reporte == 'perdido' %}checked{% endif %} disabled>
+                </div>
+                <div class="report-type-card {% if reporte.tipo_reporte == 'encontrado' %}selected{% endif %}" data-type="encontrado">
+                    <div class="type-icon">🏠</div>
+                    <h3>Mascota Encontrada</h3>
+                    <input type="radio" name="tipo_reporte" value="encontrado" id="tipo_encontrado" {% if reporte.tipo_reporte == 'encontrado' %}checked{% endif %} disabled>
+                </div>
+            </div>
+        </div>
+        <!-- Paso 2: Información de la Mascota -->
+        <div class="form-step" data-step="2">
+            <div class="step-header">
+                <h2 class="step-title">
+                    <span class="step-number">2</span>
+                    Información de la Mascota
+                </h2>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="nombre_perro">Nombre de la Mascota</label>
+                    <input type="text" id="nombre_perro" name="nombre_perro" class="form-control" value="{{ reporte.nombre_perro }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="raza">Raza</label>
+                    <select name="raza" id="raza" class="form-control">
+                        <option value="">Selecciona una raza</option>
+                        {% for raza in razas %}
+                            <option value="{{ raza.id }}" {% if reporte.raza.id == raza.id %}selected{% endif %}>{{ raza.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tamano">Tamaño</label>
+                    <select name="tamano" id="tamano" class="form-control" required>
+                        <option value="">Selecciona el tamaño</option>
+                        <option value="pequeño" {% if reporte.tamano == 'pequeño' %}selected{% endif %}>Pequeño (hasta 10 kg)</option>
+                        <option value="mediano" {% if reporte.tamano == 'mediano' %}selected{% endif %}>Mediano (10-25 kg)</option>
+                        <option value="grande" {% if reporte.tamano == 'grande' %}selected{% endif %}>Grande (25-45 kg)</option>
+                        <option value="gigante" {% if reporte.tamano == 'gigante' %}selected{% endif %}>Gigante (más de 45 kg)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="color">Color</label>
+                    <input type="text" id="color" name="color" class="form-control" value="{{ reporte.color }}" required>
+                </div>
+                <div class="form-group full-width">
+                    <label for="descripcion">Descripción General</label>
+                    <textarea id="descripcion" name="descripcion" class="form-control" required>{{ reporte.descripcion }}</textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label for="caracteristicas_distintivas">Características Distintivas</label>
+                    <textarea id="caracteristicas_distintivas" name="caracteristicas_distintivas" class="form-control">{{ reporte.caracteristicas_distintivas }}</textarea>
+                </div>
+            </div>
+        </div>
+        <!-- Paso 3: Fotos -->
+        <div class="form-step" data-step="3">
+            <div class="step-header">
+                <h2 class="step-title">
+                    <span class="step-number">3</span>
+                    Fotografías
+                </h2>
+                <p class="step-description">Puedes agregar o eliminar fotos</p>
+            </div>
+            <div class="photo-upload-section">
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">📷</div>
+                    <h3>Arrastra fotos aquí o haz clic para seleccionar</h3>
+                    <p>Puedes subir múltiples fotos. Formatos: JPG, PNG, WebP</p>
+                    <input type="file" id="fotos" name="fotos" multiple accept="image/jpeg,image/png,image/webp" class="file-input">
+                </div>
+                <div class="photo-preview" id="photo-preview">
+                    {% for foto in reporte.fotos.all %}
+                        <div class="photo-thumb">
+                            <img src="{{ foto.imagen.url }}" alt="Foto existente">
+                            <input type="checkbox" name="eliminar_foto_{{ foto.id }}"> Eliminar
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <!-- Paso 4: Ubicación -->
+        <div class="form-step" data-step="4">
+            <div class="step-header">
+                <h2 class="step-title">
+                    <span class="step-number">4</span>
+                    Ubicación del Incidente
+                </h2>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <input type="text" id="direccion" name="direccion" class="form-control" value="{{ reporte.direccion }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="zona">Zona/Colonia</label>
+                    <input type="text" id="zona" name="zona" class="form-control" value="{{ reporte.zona }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="latitud">Latitud</label>
+                    <input type="number" id="latitud" name="latitud" step="0.000001" min="-90" max="90" class="form-control" value="{{ reporte.latitud }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="longitud">Longitud</label>
+                    <input type="number" id="longitud" name="longitud" step="0.000001" min="-180" max="180" class="form-control" value="{{ reporte.longitud }}" required>
+                </div>
+            </div>
+        </div>
+        <!-- Paso 5: Fechas y Contacto -->
+        <div class="form-step" data-step="5">
+            <div class="step-header">
+                <h2 class="step-title">
+                    <span class="step-number">5</span>
+                    Fechas y Contacto
+                </h2>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="fecha_incidente">Fecha del Incidente</label>
+                    <input type="datetime-local" id="fecha_incidente" name="fecha_incidente" class="form-control" value="{{ reporte.fecha_incidente|date:'Y-m-d\TH:i' }}" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefono_contacto">Teléfono de Contacto</label>
+                    <input type="tel" id="telefono_contacto" name="telefono_contacto" class="form-control" value="{{ reporte.telefono_contacto }}" required>
+                </div>
+                <div class="form-group full-width">
+                    <label for="email_contacto">Email de Contacto</label>
+                    <input type="email" id="email_contacto" name="email_contacto" class="form-control" value="{{ reporte.email_contacto }}" required>
+                </div>
+            </div>
+        </div>
+        <!-- Navegación de pasos -->
+        <div class="form-navigation">
+            <button type="button" class="btn btn-outline" id="prev-step" style="display: none;">
+                ← Anterior
+            </button>
+            <div class="step-indicators">
+                <span class="step-dot active" data-step="1"></span>
+                <span class="step-dot" data-step="2"></span>
+                <span class="step-dot" data-step="3"></span>
+                <span class="step-dot" data-step="4"></span>
+                <span class="step-dot" data-step="5"></span>
+            </div>
+            <button type="button" class="btn btn-primary" id="next-step">
+                Siguiente →
+            </button>
+            <button type="submit" class="btn btn-primary" id="submit-report" style="display: none;">
+                <span>💾</span>
+                Guardar Cambios
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/crear_reporte.js' %}"></script>
+{% endblock %}
