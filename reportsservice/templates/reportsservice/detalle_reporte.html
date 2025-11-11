@@ -329,8 +329,11 @@
                             <span class="card-icon">⚙️</span>
                             Acciones
                         </h3>
-                        
                         <div class="report-actions">
+                            <a href="{% url 'reportsservice:editar_reporte' reporte.id %}" class="btn btn-primary btn-block">
+                                <span>✏️</span>
+                                Editar Reporte
+                            </a>
                             <a href="{% url 'reportsservice:eliminar_reporte' reporte.id %}" class="btn btn-danger btn-block">
                                 <span>🗑️</span>
                                 Eliminar Reporte
