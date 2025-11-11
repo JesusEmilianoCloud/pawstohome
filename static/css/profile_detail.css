@@ -580,63 +580,66 @@
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #e67e22, #d35400);
+    background: linear-gradient(90deg, var(--primary-orange, #ED8936) 0%, var(--secondary-orange, #F6AD55) 100%);
     color: white;
-    box-shadow: 0 4px 15px rgba(230, 126, 34, 0.3);
+    box-shadow: 0 4px 15px rgba(237, 137, 54, 0.18);
+    border: none;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: box-shadow 0.3s, transform 0.2s;
 }
 
 .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(230, 126, 34, 0.4);
+    background: linear-gradient(90deg, var(--secondary-orange, #F6AD55) 0%, var(--primary-orange, #ED8936) 100%);
+    box-shadow: 0 8px 32px rgba(237, 137, 54, 0.28);
     color: white;
-    text-decoration: none;
+    transform: translateY(-2px) scale(1.04);
 }
 
 .btn-secondary {
-    background: transparent;
-    color: #718096;
-    border: 2px solid #e2e8f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+    background: linear-gradient(90deg, #fff 0%, var(--cream, #FFFAF0) 100%);
+    color: var(--primary-orange, #ED8936);
+    border: 2px solid var(--primary-orange, #ED8936);
+    box-shadow: 0 2px 8px rgba(237, 137, 54, 0.08);
+    transition: box-shadow 0.3s, transform 0.2s;
 }
 
 .btn-secondary:hover {
-    background: #f7fafc;
-    border-color: #cbd5e0;
-    color: #2d3748;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    text-decoration: none;
+    background: var(--primary-orange, #ED8936);
+    color: #fff;
+    border-color: var(--primary-orange, #ED8936);
+    box-shadow: 0 4px 16px rgba(237, 137, 54, 0.18);
+    transform: translateY(-2px) scale(1.04);
 }
 
 /* Estilo específico para botón de logout */
 .btn-secondary.logout-btn {
     color: #e53e3e;
-    border-color: #fed7d7;
-    background: rgba(254, 215, 215, 0.1);
+    border-color: #e53e3e;
+    background: linear-gradient(90deg, #fff 0%, #ffe5e5 100%);
 }
 
 .btn-secondary.logout-btn:hover {
     background: #e53e3e;
     color: white;
     border-color: #e53e3e;
-    box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+    box-shadow: 0 4px 16px rgba(229, 62, 62, 0.18);
 }
 
 .btn-outline {
     background: transparent;
-    color: #4a5568;
-    border: 2px solid #e2e8f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    color: var(--primary-orange, #ED8936);
+    border: 2px solid var(--primary-orange, #ED8936);
+    box-shadow: 0 2px 8px rgba(237, 137, 54, 0.08);
+    transition: box-shadow 0.3s, transform 0.2s;
 }
 
 .btn-outline:hover {
-    background: #f7fafc;
-    border-color: #cbd5e0;
-    color: #2d3748;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    text-decoration: none;
+    background: var(--primary-orange, #ED8936);
+    color: #fff;
+    border-color: var(--primary-orange, #ED8936);
+    box-shadow: 0 4px 16px rgba(237, 137, 54, 0.18);
+    transform: translateY(-2px) scale(1.04);
 }
 
 /* Responsive Design */
